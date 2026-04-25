@@ -38,6 +38,13 @@ android {
 }
 
 dependencies {
+    //Added for navigation support
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    //Added for font support
+    implementation(libs.androidx.compose.ui.text.google.fonts)
+    implementation(libs.androidx.ui)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

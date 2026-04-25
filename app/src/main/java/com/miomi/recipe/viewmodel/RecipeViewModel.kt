@@ -1,40 +1,56 @@
 package com.miomi.recipe.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.miomi.recipe.data.RecipeRepository
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.miomi.recipe.RecipeApplication
+import com.miomi.recipe.data.repository.RecipeRepository
+import com.miomi.recipe.model.Ingredient
 import com.miomi.recipe.model.Recipe
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.miomi.recipe.model.Step
+import kotlinx.coroutines.launch
 
-class RecipeViewModel : ViewModel() {
-    private val recipeRepo = RecipeRepository()
+class RecipeViewModel(private val  recipeRepository: RecipeRepository ) : ViewModel()
+{
 
-    private val _recipes = MutableStateFlow(recipeRepo.getAllRecipes())
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val myRepository = // 4
+                    (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
+                            as RecipeApplication).recipeRepository
+                RecipeViewModel(
+                    recipeRepository = myRepository
+                )
+            }
+        }
+    }
 
-    val recipes: StateFlow<List<Recipe>> = _recipes.asStateFlow()
+    val recipesFlow = recipeRepository.getAllRecipesStream()
 
     fun getCategories(): List<String> {
         return RecipeRepository.categories
     }
 
+    //TODO: this is not how recipes should be created. I am only doing this to get the app compiling
     fun addRecipe(name: String, category: String, ingredients: String, instructions: String) {
-        recipeRepo.addRecipe(name, category, ingredients, instructions)
-        _recipes.value = recipeRepo.getAllRecipes()
+        viewModelScope.launch {
+            val newId = (System.currentTimeMillis() % Int.MAX_VALUE).toInt()
+            val recipe = Recipe(newId, name, category, true)
+            val ingredient = Ingredient(newId, ingredients, 3, "sample unit")
+            val step = Step(newId, 0, instructions)
+
+            recipeRepository.insertRecipe(recipe)
+            recipeRepository.insertIngredient(ingredient)
+            recipeRepository.insertStep(step)
+        }
     }
 
     //One shot retrieval, used for detail screen navigation
     fun getRecipeById(id: Int): Recipe? {
-        return recipeRepo.getRecipeById(id)
+        return recipeRepository.getRecipeById(id)
     }
 
-    //Not currently used
-    fun getAllRecipes(): List<Recipe> {
-        return recipeRepo.getAllRecipes()
-    }
-
-    //Not currently used
-    fun getRecipesByCategory(category: String): List<Recipe> {
-        return recipeRepo.getRecipesByCategory(category)
-    }
 }

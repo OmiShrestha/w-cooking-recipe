@@ -3,11 +3,11 @@ package com.miomi.recipe.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "recipe")
-data class Recipe(
+@Entity(tableName = "Ingredient")
+data class Ingredient(
     @PrimaryKey
-    val recipeId: Int,
+    val ingredientId: Int,
     val name: String,
-    val category: String,
-    val isFavorite: Boolean
+    val quantity: Int,
+    val unit: String
 )

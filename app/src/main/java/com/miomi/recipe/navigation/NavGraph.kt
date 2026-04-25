@@ -13,14 +13,16 @@ import kotlin.text.toInt
 
 @Composable
 fun NavGraph(navController: NavHostController) {
-    val recipeViewModel: RecipeViewModel = viewModel()
+    val recipeViewModel: RecipeViewModel = viewModel(
+        factory = RecipeViewModel.Factory
+    )
 
     NavHost(
         navController = navController,
         startDestination = "recipe_list"
     ) {
         composable("recipe_list") {
-            RecipeListScreen(navController,recipeViewModel)
+            RecipeListScreen(navController, recipeViewModel)
         }
 
         composable("add_recipe") {

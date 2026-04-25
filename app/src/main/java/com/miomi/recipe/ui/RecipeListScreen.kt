@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlin.collections.filter
 import kotlin.collections.forEach
 import kotlin.text.equals
@@ -44,7 +45,7 @@ import kotlin.text.uppercase
 
 @Composable
 fun RecipeListScreen(navController: NavController, viewModel: RecipeViewModel) {
-    val recipes by viewModel.recipes.collectAsState()
+    val recipes by viewModel.recipesFlow.collectAsStateWithLifecycle(emptyList())
 
     Scaffold(
         floatingActionButton = {
@@ -114,7 +115,7 @@ private fun LazyListScope.recipeCategorySection(
         items(recipes) { recipe ->
             RecipeCard(
                 recipe = recipe,
-                onClick = { navController.navigate("recipe_detail/${recipe.id}") })
+                onClick = { navController.navigate("recipe_detail/${recipe.recipeId}") })
         }
         item {
             HorizontalDivider(
@@ -181,7 +182,7 @@ private fun RowScope.CardContent(recipe: Recipe) {
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = recipe.ingredients,
+            text = "Work in progress",
             style = MaterialTheme.typography.bodySmall,
             maxLines = 2
         )

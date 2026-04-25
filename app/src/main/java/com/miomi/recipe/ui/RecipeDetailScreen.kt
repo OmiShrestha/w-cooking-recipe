@@ -51,7 +51,7 @@ fun RecipeDetailScreen(
 
             ScreenTitle()
 
-            RecipeInfo(recipe)
+            RecipeInfo(recipe, viewModel)
 
             BackButton(navController)
         }
@@ -72,15 +72,15 @@ private fun ScreenTitle() {
 }
 
 @Composable
-private fun RecipeInfo(recipe: Recipe) {
+private fun RecipeInfo(recipe: Recipe, viewModel: RecipeViewModel) {
     Text(
         recipe.name,
         style = MaterialTheme.typography.headlineLarge
     )
 
     DetailSection(label = "Category", value = recipe.category)
-    DetailSection(label = "Ingredients", value = recipe.ingredients)
-    DetailSection(label = "Instructions", value = recipe.instructions)
+    DetailSection(label = "Ingredients", value =  "Work in progress")
+    DetailSection(label = "Instructions", value = "Work in progress")
 }
 
 @Composable

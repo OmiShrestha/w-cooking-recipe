@@ -5,8 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "Step")
 data class Step(
-    @PrimaryKey
-    val stepId: Int,
+    @PrimaryKey(autoGenerate = true)
+    val stepId: Int = 0,         // adding stepId as primary key for the Step table
+    val recipeId: Int,           // adding recipeId to link step to its recipe
     val sequenceNum: Int,
     val step: String
 )

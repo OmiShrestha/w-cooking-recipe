@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 class RecipeRepositoryImpl (private val recipeDb: RecipeDatabase) : RecipeRepository{
     override fun getAllRecipesStream(): Flow<List<Recipe>> = recipeDb.recipeDao().getAllRecipes()
 
-    override fun getRecipeById(recipeId: Int): Recipe = recipeDb.recipeDao().getRecipeById(recipeId)
+    override fun getRecipeById(recipeId: Int): Flow<Recipe?> = recipeDb.recipeDao().getRecipeById(recipeId)
 
     override fun getAllFavoritesStream(): Flow<List<Recipe>> = recipeDb.recipeDao().getFavoriteRecipes()
 

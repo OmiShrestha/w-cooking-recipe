@@ -18,7 +18,7 @@ interface RecipeDao {
     fun getFavoriteRecipes(): Flow<List<Recipe>>
 
     @Query("SELECT * FROM recipe WHERE recipeId = :id")
-    fun getRecipeById(id: Int): Recipe
+    fun getRecipeById(id: Int): Flow<Recipe?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRecipe(recipe: Recipe)

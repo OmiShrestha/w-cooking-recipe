@@ -41,9 +41,16 @@ interface RecipeRepository {
 
     fun getAllRecipesStream(): Flow<List<Recipe>>
 
-    fun getRecipeById(recipeId: Int): Recipe?
+    // returns a flow of the recipe with the given ID, or null if it doesn't exist
+    fun getRecipeById(recipeId: Int): Flow<Recipe?>
+
+    // returns a flow of the list of recipes that are marked as favorites
     fun getAllFavoritesStream(): Flow<List<Recipe>>
+
+    // returns a flow of the list of recipes that belong to the given category
     fun getStepsStream(recipeId: Int): Flow<List<Step>>
+
+    // returns a flow of the list of ingredients that belong to the given recipe
     fun getIngredientsStream(recipeId: Int): Flow<List<Ingredient>>
 
     suspend fun insertRecipe(recipe: Recipe)

@@ -14,15 +14,17 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.miomi.recipe.model.Ingredient
 import com.miomi.recipe.model.Recipe
+import com.miomi.recipe.model.Step
 import com.miomi.recipe.viewmodel.RecipeViewModel
-import kotlin.let
-import kotlin.text.uppercase
 
 @Composable
 fun RecipeDetailScreen(
@@ -30,7 +32,10 @@ fun RecipeDetailScreen(
     viewModel: RecipeViewModel,
     recipeId: Int?
 ) {
-    val recipe = recipeId?.let { viewModel.getRecipeById(it) }
+    val id = recipeId ?: -1
+    val recipe by viewModel.getRecipeStream(id).collectAsStateWithLifecycle(null)
+    val ingredients by viewModel.getIngredientsStream(id).collectAsStateWithLifecycle(emptyList())
+    val steps by viewModel.getStepsStream(id).collectAsStateWithLifecycle(emptyList())
 
     if (recipe == null) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -48,11 +53,8 @@ fun RecipeDetailScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
             ScreenTitle()
-
-            RecipeInfo(recipe, viewModel)
-
+            RecipeInfo(recipe!!, ingredients, steps)
             BackButton(navController)
         }
     }
@@ -60,27 +62,55 @@ fun RecipeDetailScreen(
 
 @Composable
 private fun ScreenTitle() {
-    Text(
-        "Recipe Details",
-        style = MaterialTheme.typography.headlineLarge
-    )
-
-    HorizontalDivider(
-        modifier = Modifier.padding(bottom = 4.dp),
-        thickness = 2.dp
-    )
+    Text("Recipe Details", style = MaterialTheme.typography.headlineLarge)
+    HorizontalDivider(modifier = Modifier.padding(bottom = 4.dp), thickness = 2.dp)
 }
 
+// Displays the recipe name, category, ingredients, and instructions
 @Composable
-private fun RecipeInfo(recipe: Recipe, viewModel: RecipeViewModel) {
-    Text(
-        recipe.name,
-        style = MaterialTheme.typography.headlineLarge
-    )
-
+private fun RecipeInfo(recipe: Recipe, ingredients: List<Ingredient>, steps: List<Step>) {
+    Text(recipe.name, style = MaterialTheme.typography.headlineLarge)
     DetailSection(label = "Category", value = recipe.category)
-    DetailSection(label = "Ingredients", value =  "Work in progress")
-    DetailSection(label = "Instructions", value = "Work in progress")
+
+    SectionHeader("INGREDIENTS")
+    if (ingredients.isEmpty()) {
+        Text("No ingredients added", style = MaterialTheme.typography.bodyMedium)
+    } else {
+        ingredients.forEach { ingredient ->
+            Text(
+                text = "• ${ingredient.name}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 2.dp)
+            )
+        }
+    }
+    HorizontalDivider()
+
+    SectionHeader("INSTRUCTIONS")
+    if (steps.isEmpty()) {
+        Text("No instructions added", style = MaterialTheme.typography.bodyMedium)
+    } else {
+        steps.forEach { step ->
+            Text(
+                text = "${step.sequenceNum}. ${step.step}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+        }
+    }
+    HorizontalDivider()
+}
+
+// Reusable composable for displaying a labeled section
+@Composable
+private fun SectionHeader(label: String) {
+    Text(
+        text = label,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+    )
 }
 
 @Composable

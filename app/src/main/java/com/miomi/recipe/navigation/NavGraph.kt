@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.miomi.recipe.ui.AddRecipeScreen
+import com.miomi.recipe.ui.FavoritesScreen
 import com.miomi.recipe.ui.RecipeDetailScreen
 import com.miomi.recipe.ui.RecipeListScreen
 import com.miomi.recipe.viewmodel.RecipeViewModel
@@ -32,6 +33,11 @@ fun NavGraph(navController: NavHostController) {
         composable("recipe_detail/{recipeId}") { backStackEntry ->
             val recipeId = backStackEntry.arguments?.getString("recipeId")?.toInt()
             RecipeDetailScreen(navController, recipeViewModel, recipeId)
+        }
+
+        // placeholder for favorites screen
+        composable("favorites") {
+            FavoritesScreen(navController, recipeViewModel)
         }
     }
 }

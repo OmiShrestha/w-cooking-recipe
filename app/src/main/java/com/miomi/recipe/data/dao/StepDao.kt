@@ -10,18 +10,20 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface StepDao {
-    @Query("SELECT * FROM step WHERE stepId = :recipeId ORDER BY sequenceNum ASC")
+
+    // returns all steps for a given recipe, ordered by sequence number
+    @Query("SELECT * FROM Step WHERE recipeId = :recipeId ORDER BY sequenceNum ASC")
     fun getStepsForRecipe(recipeId: Int): Flow<List<Step>>
 
-
-    @Query("DELETE FROM step WHERE stepId = :recipeId")
-    suspend fun deleteAllStepsForRecipe(recipeId: Int)
-
-    @Delete
-    suspend fun deleteStep(step: Step)
-
+    // returns a single step by its ID
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStep(step: Step)
 
+    // deletes a single step
+    @Delete
+    suspend fun deleteStep(step: Step)
 
+    // deletes all steps for a given recipe
+    @Query("DELETE FROM Step WHERE recipeId = :recipeId")
+    suspend fun deleteAllStepsForRecipe(recipeId: Int)
 }

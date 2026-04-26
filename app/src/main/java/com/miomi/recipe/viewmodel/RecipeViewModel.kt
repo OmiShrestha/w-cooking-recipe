@@ -10,6 +10,7 @@ import com.miomi.recipe.data.repository.RecipeRepository
 import com.miomi.recipe.model.Ingredient
 import com.miomi.recipe.model.Recipe
 import com.miomi.recipe.model.Step
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class RecipeViewModel(private val  recipeRepository: RecipeRepository ) : ViewModel()
@@ -29,28 +30,30 @@ class RecipeViewModel(private val  recipeRepository: RecipeRepository ) : ViewMo
     }
 
     val recipesFlow = recipeRepository.getAllRecipesStream()
+    val favoritesFlow = recipeRepository.getAllFavoritesStream()
+
+    fun toggleFavorite(recipeId: Int, isFavorite: Boolean) {
+        viewModelScope.launch {
+            recipeRepository.updateIsFavorite(recipeId, !isFavorite)
+        }
+    }
 
     fun getCategories(): List<String> {
         return RecipeRepository.categories
     }
 
     //TODO: this is not how recipes should be created. I am only doing this to get the app compiling
+    fun getRecipeStream(id: Int): Flow<Recipe?> = recipeRepository.getRecipeById(id)
+    fun getIngredientsStream(recipeId: Int): Flow<List<Ingredient>> = recipeRepository.getIngredientsStream(recipeId)
+    fun getStepsStream(recipeId: Int): Flow<List<Step>> = recipeRepository.getStepsStream(recipeId)
+
     fun addRecipe(name: String, category: String, ingredients: String, instructions: String) {
         viewModelScope.launch {
             val newId = (System.currentTimeMillis() % Int.MAX_VALUE).toInt()
-            val recipe = Recipe(newId, name, category, true)
-            val ingredient = Ingredient(newId, ingredients, 3, "sample unit")
-            val step = Step(newId, 0, instructions)
-
-            recipeRepository.insertRecipe(recipe)
-            recipeRepository.insertIngredient(ingredient)
-            recipeRepository.insertStep(step)
+            recipeRepository.insertRecipe(Recipe(newId, name, category, false))
+            recipeRepository.insertIngredient(Ingredient(recipeId = newId, name = ingredients, quantity = 1, unit = ""))
+            recipeRepository.insertStep(Step(recipeId = newId, sequenceNum = 1, step = instructions))
         }
-    }
-
-    //One shot retrieval, used for detail screen navigation
-    fun getRecipeById(id: Int): Recipe? {
-        return recipeRepository.getRecipeById(id)
     }
 
 }

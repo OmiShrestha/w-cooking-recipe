@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface IngredientDao {
-    @Query("SELECT * FROM Ingredient WHERE ingredientId = :recipeId")
+    @Query("SELECT * FROM Ingredient WHERE recipeId = :recipeId")           // adding recipeId to the query to filter ingredients by recipe
     fun getAllIngredientsForRecipe(recipeId: Int): Flow<List<Ingredient>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -19,6 +19,6 @@ interface IngredientDao {
     @Delete
     suspend fun deleteIngredient(ingredient: Ingredient)
 
-    @Query("DELETE FROM Ingredient WHERE ingredientId = :recipeId")
+    @Query("DELETE FROM Ingredient WHERE recipeId = :recipeId")             // adding recipeId to the query to delete ingredients by recipe 
     suspend fun deleteAllIngredientsForRecipe(recipeId: Int)
 }

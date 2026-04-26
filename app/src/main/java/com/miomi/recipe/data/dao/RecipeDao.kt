@@ -5,8 +5,10 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.miomi.recipe.model.Recipe
+import com.miomi.recipe.model.RecipeWithDetails
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -16,6 +18,10 @@ interface RecipeDao {
 
     @Query("SELECT * FROM recipe WHERE isFavorite = 1")
     fun getFavoriteRecipes(): Flow<List<Recipe>>
+
+    @Transaction
+    @Query("SELECT * FROM recipe WHERE recipeId = :recipeId")
+    fun getRecipeWithDetails(recipeId: Int): Flow<RecipeWithDetails>
 
     @Query("SELECT * FROM recipe WHERE recipeId = :id")
     fun getRecipeById(id: Int): Flow<Recipe?>

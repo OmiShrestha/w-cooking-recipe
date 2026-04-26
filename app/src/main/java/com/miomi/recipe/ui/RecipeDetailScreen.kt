@@ -77,11 +77,16 @@ private fun RecipeInfo(recipe: Recipe, ingredients: List<Ingredient>, steps: Lis
         Text("No ingredients added", style = MaterialTheme.typography.bodyMedium)
     } else {
         ingredients.forEach { ingredient ->
-            Text(
-                text = "• ${ingredient.name}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 2.dp)
-            )
+            // Split ingredient name by line breaks and display each as a bullet
+            ingredient.name.split("\n").forEach { line ->
+                if (line.isNotBlank()) {
+                    Text(
+                        text = "• ${line.trim()}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 2.dp)
+                    )
+                }
+            }
         }
     }
     HorizontalDivider()
@@ -90,12 +95,19 @@ private fun RecipeInfo(recipe: Recipe, ingredients: List<Ingredient>, steps: Lis
     if (steps.isEmpty()) {
         Text("No instructions added", style = MaterialTheme.typography.bodyMedium)
     } else {
+        var instructionIndex = 1
         steps.forEach { step ->
-            Text(
-                text = "${step.sequenceNum}. ${step.step}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
+            // Split step text by line breaks and display each as a numbered item
+            step.step.split("\n").forEach { line ->
+                if (line.isNotBlank()) {
+                    Text(
+                        text = "${instructionIndex}. ${line.trim()}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    instructionIndex++
+                }
+            }
         }
     }
     HorizontalDivider()

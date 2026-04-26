@@ -17,7 +17,7 @@ class RecipeRepositoryImpl (private val recipeDb: RecipeDatabase) : RecipeReposi
 
     override fun getIngredientsStream(recipeId: Int): Flow<List<Ingredient>> = recipeDb.ingredientDao().getAllIngredientsForRecipe(recipeId)
 
-    override suspend fun insertRecipe(recipe: Recipe) = recipeDb.recipeDao().insertRecipe(recipe)
+    override suspend fun insertRecipe(recipe: Recipe): Long = recipeDb.recipeDao().insertRecipe(recipe)
 
     override suspend fun insertStep(step: Step) = recipeDb.stepDao().insertStep(step)
 

@@ -53,7 +53,7 @@ interface RecipeRepository {
     // returns a flow of the list of ingredients that belong to the given recipe
     fun getIngredientsStream(recipeId: Int): Flow<List<Ingredient>>
 
-    suspend fun insertRecipe(recipe: Recipe)
+    suspend fun insertRecipe(recipe: Recipe): Long
     suspend fun insertStep(step: Step)
     suspend fun insertIngredient(ingredient: Ingredient)
     suspend fun updateIsFavorite(recipeId: Int, isFavorite: Boolean)

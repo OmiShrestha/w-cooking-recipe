@@ -47,6 +47,38 @@ class RecipeViewModel(private val  recipeRepository: RecipeRepository ) : ViewMo
     fun getIngredientsStream(recipeId: Int): Flow<List<Ingredient>> = recipeRepository.getIngredientsStream(recipeId)
     fun getStepsStream(recipeId: Int): Flow<List<Step>> = recipeRepository.getStepsStream(recipeId)
 
+    fun newAddRecipe(formState: AddRecipeFormState){
+        viewModelScope.launch {
+            val recipeId = recipeRepository.insertRecipe(
+                Recipe(
+                    name = formState.recipeName,
+                    category = formState.category,
+                    isFavorite = false
+                )
+            )
+            formState.ingredients.forEach { entry ->
+                recipeRepository.insertIngredient(
+                    Ingredient(
+                        recipeId = recipeId.toInt(),
+                        name = entry.name,
+                        quantity = entry.quantity.toIntOrNull() ?: 0,
+                        unit = entry.unit
+                    )
+                )
+            }
+
+            formState.steps.forEachIndexed { index, entry ->
+                recipeRepository.insertStep(
+                    Step(
+                        recipeId = recipeId.toInt(),
+                        sequenceNum = index + 1,
+                        step = entry.description
+                    )
+                )
+            }
+        }
+    }
+
     fun addRecipe(name: String, category: String, ingredients: String, instructions: String) {
         viewModelScope.launch {
             val newId = (System.currentTimeMillis() % Int.MAX_VALUE).toInt()

@@ -27,7 +27,7 @@ interface RecipeDao {
     fun getRecipeById(id: Int): Flow<Recipe?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRecipe(recipe: Recipe)
+    suspend fun insertRecipe(recipe: Recipe): Long
 
     @Query("UPDATE recipe SET isFavorite = :isFavorite WHERE recipeId = :id")
     suspend fun updateIsFavorite(id: Int, isFavorite: Boolean)

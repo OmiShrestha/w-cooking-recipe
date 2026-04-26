@@ -45,7 +45,7 @@ fun RecipeListScreen(navController: NavController, viewModel: RecipeViewModel) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("add_recipe") },
+                onClick = { navController.navigate("create_recipe_flow") },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {

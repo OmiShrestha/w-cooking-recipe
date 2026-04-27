@@ -66,12 +66,12 @@ recipe_detail --> recipe_list : back
 
 | Screen | Function |
 |---|---|
-| `recipe_list` | Home screen; displays all recipes grouped by category; navigate to favorites, recipe detail, or create flow |
-| `favorites` | Displays recipes marked as favorite; tap to view details or toggle favorite off |
-| `recipe_detail` | Shows full details of a selected recipe including ingredients and steps |
-| `add_recipe_details` | Step 1 of create flow — enter recipe name and category |
-| `add_ingredients` | Step 2 of create flow — add ingredients with name, quantity, and unit |
-| `add_steps` | Step 3 of create flow — add cooking steps; submit saves the recipe |
+| `recipe_list` | Displays all recipes organized by category. Entry point for navigating to recipe detail, favorites, and the create recipe flow. |
+| `favorites` | Displays all recipes marked as favorites. Navigated to by selecting the heart icon. |
+| `recipe_detail` | Displays the full details of a selected recipe including ingredients and steps. |
+| `add_recipe_details` | Step 1 of the create recipe flow. Collects the recipe name and category. |
+| `add_ingredients` | Step 2 of the create recipe flow. Collects the ingredients with name, quantity, and unit. |
+| `add_steps` | Step 3 of the create recipe flow. Collects the preparation steps in order. This is where the user saves their new recipe. |
 
 ---
 

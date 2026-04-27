@@ -93,7 +93,8 @@ fun AddStepsScreen(
                 )
             }
             FormButtons(
-                onCancel = { navController.popBackStack("recipe_list", inclusive = false) },
+                onCancel = { navController.popBackStack() },
+                cancelLabel = "Back",
                 onSave = {
                     if (addRecipeViewModel.isStepsValid()) {
                         recipeViewModel.addRecipe(addRecipeViewModel.formState)

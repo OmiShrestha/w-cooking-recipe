@@ -91,7 +91,8 @@ fun AddIngredientsScreen(navController: NavController, viewModel: AddRecipeViewM
             }
 
             FormButtons(
-                onCancel = { navController.popBackStack("recipe_list", inclusive = false) },
+                onCancel = { navController.popBackStack() },
+                cancelLabel = "Back",
                 onSave = {
                     if (viewModel.isIngredientsValid()) {
                         navController.navigate("add_steps")

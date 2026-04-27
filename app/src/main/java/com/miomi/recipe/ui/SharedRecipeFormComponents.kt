@@ -131,6 +131,7 @@ fun CategoryDropdownMenu(
 fun FormButtons(
     onCancel: () -> Unit,
     onSave: () -> Unit,
+    cancelLabel: String = "Cancel",
     saveLabel: String = "Save Recipe"
 ) {
     Row(
@@ -141,7 +142,7 @@ fun FormButtons(
             onClick = onCancel,
             modifier = Modifier.weight(1f)
         ) {
-            Text("Cancel", color = MaterialTheme.colorScheme.secondary)
+            Text(cancelLabel, color = MaterialTheme.colorScheme.secondary)
         }
         Button(
             onClick = onSave,

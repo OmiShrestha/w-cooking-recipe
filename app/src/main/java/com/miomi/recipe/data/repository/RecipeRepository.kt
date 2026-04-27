@@ -31,4 +31,10 @@ interface RecipeRepository {
     suspend fun insertIngredient(ingredient: Ingredient): Long
 
     suspend fun updateIsFavorite(recipeId: Int, isFavorite: Boolean)
+
+    suspend fun updateRecipe(recipe: Recipe)
+
+    suspend fun deleteAllIngredientsForRecipe(recipeId: Int)
+
+    suspend fun deleteAllStepsForRecipe(recipeId: Int)
 }

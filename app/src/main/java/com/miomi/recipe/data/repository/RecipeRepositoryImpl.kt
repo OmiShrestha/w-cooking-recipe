@@ -22,4 +22,10 @@ class RecipeRepositoryImpl (private val recipeDb: RecipeDatabase) : RecipeReposi
 
     override suspend fun updateIsFavorite(recipeId: Int, isFavorite: Boolean) = recipeDb.recipeDao().updateIsFavorite(recipeId, isFavorite)
 
+    override suspend fun updateRecipe(recipe: Recipe) = recipeDb.recipeDao().updateRecipe(recipe)
+
+    override suspend fun deleteAllIngredientsForRecipe(recipeId: Int) = recipeDb.ingredientDao().deleteAllIngredientsForRecipe(recipeId)
+
+    override suspend fun deleteAllStepsForRecipe(recipeId: Int) = recipeDb.stepDao().deleteAllStepsForRecipe(recipeId)
+
 }

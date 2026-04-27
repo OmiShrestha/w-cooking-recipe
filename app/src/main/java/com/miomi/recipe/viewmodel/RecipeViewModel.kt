@@ -80,4 +80,40 @@ class RecipeViewModel(private val  recipeRepository: RecipeRepository ) : ViewMo
         }
     }
 
+    // updates an existing recipe by first updating the recipe table, then deleting/reinserting all associated ingredients and steps
+    fun updateRecipe(formState: AddRecipeFormState) {
+        val recipeId = formState.recipeId ?: return
+        viewModelScope.launch {
+            recipeRepository.updateRecipe(
+                Recipe(
+                    recipeId = recipeId,
+                    name = formState.recipeName,
+                    category = formState.category,
+                    isFavorite = formState.isFavorite
+                )
+            )
+            recipeRepository.deleteAllIngredientsForRecipe(recipeId)
+            formState.ingredients.forEach { entry ->
+                recipeRepository.insertIngredient(
+                    Ingredient(
+                        recipeId = recipeId,
+                        name = entry.name,
+                        quantity = entry.quantity.toDoubleOrNull() ?: 0.0,
+                        unit = entry.unit
+                    )
+                )
+            }
+            recipeRepository.deleteAllStepsForRecipe(recipeId)
+            formState.steps.forEachIndexed { index, entry ->
+                recipeRepository.insertStep(
+                    Step(
+                        recipeId = recipeId,
+                        sequenceNum = index + 1,
+                        step = entry.description
+                    )
+                )
+            }
+        }
+    }
+    
 }

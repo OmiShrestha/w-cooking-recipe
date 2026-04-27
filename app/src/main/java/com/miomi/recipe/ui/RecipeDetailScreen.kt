@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -63,6 +64,12 @@ fun RecipeDetailScreen(
                     ) {
                         ScreenTitle()
                         RecipeInfo(details.recipe, details.ingredients, details.steps)
+                        Button(
+                            onClick = { navController.navigate("edit_recipe_flow/${details.recipe.recipeId}") },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Edit Recipe")
+                        }
                         BackButton(navController)
                     }
                 }

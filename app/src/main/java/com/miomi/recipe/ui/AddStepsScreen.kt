@@ -55,7 +55,10 @@ fun AddStepsScreen(
                 },
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Step 3 of 3 — Steps", style = MaterialTheme.typography.headlineLarge)
+            Text(
+                if (addRecipeViewModel.isEditing) "Edit Recipe — Steps" else "Step 3 of 3 — Steps",
+                style = MaterialTheme.typography.headlineLarge
+            )
             HorizontalDivider(thickness = 2.dp)
 
             LazyColumn(
@@ -97,14 +100,21 @@ fun AddStepsScreen(
                 cancelLabel = "Back",
                 onSave = {
                     if (addRecipeViewModel.isStepsValid()) {
-                        recipeViewModel.addRecipe(addRecipeViewModel.formState)
-                        addRecipeViewModel.clearForm()
-                        navController.popBackStack("recipe_list", inclusive = false)
+                        val recipeId = addRecipeViewModel.formState.recipeId
+                        if (recipeId != null) {
+                            recipeViewModel.updateRecipe(addRecipeViewModel.formState)
+                            addRecipeViewModel.clearForm()
+                            navController.popBackStack("recipe_detail/$recipeId", inclusive = false)
+                        } else {
+                            recipeViewModel.addRecipe(addRecipeViewModel.formState)
+                            addRecipeViewModel.clearForm()
+                            navController.popBackStack("recipe_list", inclusive = false)
+                        }
                     } else {
                         errorMessage = "Please fill in all step fields"
                     }
                 },
-                saveLabel = "Save Recipe"
+                saveLabel = if (addRecipeViewModel.isEditing) "Update Recipe" else "Save Recipe"
             )
         }
     }

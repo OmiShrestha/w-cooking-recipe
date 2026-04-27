@@ -40,7 +40,10 @@ fun AddRecipeDetailsScreen(navController: NavController, viewModel: AddRecipeVie
                 },
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Step 1 of 3 — Details", style = MaterialTheme.typography.headlineLarge)
+            Text(
+                if (viewModel.isEditing) "Edit Recipe — Details" else "Step 1 of 3 — Details",
+                style = MaterialTheme.typography.headlineLarge
+            )
             HorizontalDivider(thickness = 2.dp)
 
             RecipeDetailsSection(
@@ -64,7 +67,7 @@ fun AddRecipeDetailsScreen(navController: NavController, viewModel: AddRecipeVie
                 onCancel = { navController.popBackStack() },
                 onSave = {
                     if (viewModel.isDetailsValid()) {
-                        navController.navigate("add_ingredients")
+                        navController.navigate(if (viewModel.isEditing) "edit_add_ingredients" else "add_ingredients")
                     } else {
                         errorMessage = "Please fill in all fields"
                     }

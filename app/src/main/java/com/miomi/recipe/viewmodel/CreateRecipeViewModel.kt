@@ -13,6 +13,8 @@ import com.miomi.recipe.data.repository.RecipeRepository
 
 //This data class is distinct from the recipe room entity and represents the UI state for the recipe creation flow.
 data class AddRecipeFormState(
+    val recipeId: Int? = null,
+    val isFavorite: Boolean = false,
     val recipeName: String = "",
     val category: String = "",
     val ingredients: List<IngredientEntry> = listOf(IngredientEntry()),
@@ -75,6 +77,27 @@ class AddRecipeViewModel : ViewModel() {
         updated.removeAt(index)
         formState = formState.copy(steps = updated)
     }
+
+    // loads the existing recipe data into the form state for editing
+    fun loadExisting(
+        recipeId: Int,
+        name: String,
+        category: String,
+        isFavorite: Boolean,
+        ingredients: List<IngredientEntry>,
+        steps: List<StepEntry>
+    ) {
+        formState = AddRecipeFormState(
+            recipeId = recipeId,
+            isFavorite = isFavorite,
+            recipeName = name,
+            category = category,
+            ingredients = ingredients,
+            steps = steps
+        )
+    }
+
+    val isEditing: Boolean get() = formState.recipeId != null
 
     fun clearForm() {
         formState = AddRecipeFormState()

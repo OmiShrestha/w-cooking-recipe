@@ -52,7 +52,10 @@ fun AddIngredientsScreen(navController: NavController, viewModel: AddRecipeViewM
                 },
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Step 2 of 3 - Ingredients", style = MaterialTheme.typography.headlineLarge)
+            Text(
+                if (viewModel.isEditing) "Edit Recipe — Ingredients" else "Step 2 of 3 — Ingredients",
+                style = MaterialTheme.typography.headlineLarge
+            )
             HorizontalDivider(thickness = 2.dp)
 
             LazyColumn(
@@ -95,7 +98,7 @@ fun AddIngredientsScreen(navController: NavController, viewModel: AddRecipeViewM
                 cancelLabel = "Back",
                 onSave = {
                     if (viewModel.isIngredientsValid()) {
-                        navController.navigate("add_steps")
+                        navController.navigate(if (viewModel.isEditing) "edit_add_steps" else "add_steps")
                     } else {
                         errorMessage = "Please fill in all ingredient fields"
                     }

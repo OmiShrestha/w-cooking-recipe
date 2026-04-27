@@ -18,6 +18,6 @@ data class Ingredient(
     @PrimaryKey(autoGenerate = true) val ingredientId: Int = 0,
     val recipeId: Int, //Foreign key in recipe table
     val name: String,
-    val quantity: Int,
+    val quantity: Double,
     val unit: String
 )

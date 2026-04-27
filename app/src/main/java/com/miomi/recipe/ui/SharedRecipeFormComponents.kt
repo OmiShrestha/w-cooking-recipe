@@ -32,10 +32,12 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun RecipeDetailsSection(
-    state: RecipeFormState,
+    name: String,
+    category: String,
     focusManager: FocusManager,
     categories: List<String>,
-    onStateChange: (RecipeFormState) -> Unit
+    onNameChange: (String) -> Unit,
+    onCategoryChange: (String) -> Unit
 ) {
     Text(
         text = "Recipe Details",
@@ -43,18 +45,18 @@ fun RecipeDetailsSection(
         color = MaterialTheme.colorScheme.secondary
     )
     OutlinedTextField(
-        value = state.name,
-        onValueChange = { onStateChange(state.copy(name = it)) },
+        value = name,
+        onValueChange = onNameChange,
         label = { Text("Recipe Name") },
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
     )
     CategoryDropdown(
-        selectedCategory = state.category,
+        selectedCategory = category,
         focusManager = focusManager,
         categories = categories,
-        onCategoryChange = { onStateChange(state.copy(category = it)) }
+        onCategoryChange = onCategoryChange
     )
 }
 

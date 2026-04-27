@@ -25,7 +25,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.miomi.recipe.viewmodel.RecipeViewModel
 
-// Placeholder screen for favorites (later will be replaced with actual implementation)
 @Composable
 fun FavoritesScreen(navController: NavController, viewModel: RecipeViewModel) {
     val favorites by viewModel.favoritesFlow.collectAsStateWithLifecycle(emptyList())

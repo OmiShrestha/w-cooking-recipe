@@ -7,12 +7,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,30 +50,31 @@ fun AddStepsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState())
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = { focusManager.clearFocus() })
                 },
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Add Recipe", style = MaterialTheme.typography.headlineLarge)
+            Text("Step 3 of 3 — Steps", style = MaterialTheme.typography.headlineLarge)
             HorizontalDivider(thickness = 2.dp)
 
-            Text(
-                "Step 3 of 3 — Steps",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.secondary
-            )
-
-            addRecipeViewModel.formState.steps.forEachIndexed {index, step ->
-                StepRow(
-                    step = step,
-                    index = index,
-                    showDelete = addRecipeViewModel.formState.steps.size > 1,
-                    onUpdate = { addRecipeViewModel.updateStep(index, it) },
-                    onDelete = { addRecipeViewModel.removeStep(index) }
-                )
-                HorizontalDivider()
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                itemsIndexed(
+                    items = addRecipeViewModel.formState.steps,
+                    key = { index, _ -> index }
+                ) { index, step ->
+                    StepRow(
+                        step = step,
+                        index = index,
+                        showDelete = addRecipeViewModel.formState.steps.size > 1,
+                        onUpdate = { addRecipeViewModel.updateStep(index, it) },
+                        onDelete = { addRecipeViewModel.removeStep(index) }
+                    )
+                    HorizontalDivider()
+                }
             }
 
             OutlinedButton(
@@ -92,31 +92,19 @@ fun AddStepsScreen(
                     color = MaterialTheme.colorScheme.error
                 )
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Back", color = MaterialTheme.colorScheme.secondary)
-                }
-                Button(
-                    onClick = {
-                        if (addRecipeViewModel.isStepsValid()) {
-                            recipeViewModel.newAddRecipe(addRecipeViewModel.formState)
-                            addRecipeViewModel.clearForm()
-                            navController.popBackStack("recipe_list", inclusive = false)
-                        } else {
-                            errorMessage = "Please fill in all step fields"
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Save Recipe")
-                }
-            }
+            FormButtons(
+                onCancel = { navController.popBackStack("recipe_list", inclusive = false) },
+                onSave = {
+                    if (addRecipeViewModel.isStepsValid()) {
+                        recipeViewModel.addRecipe(addRecipeViewModel.formState)
+                        addRecipeViewModel.clearForm()
+                        navController.popBackStack("recipe_list", inclusive = false)
+                    } else {
+                        errorMessage = "Please fill in all step fields"
+                    }
+                },
+                saveLabel = "Save Recipe"
+            )
         }
     }
 }
@@ -149,7 +137,7 @@ private fun StepRow(
         OutlinedTextField(
             value = step.description,
             onValueChange = { onUpdate(step.copy(description = it)) },
-            label = { Text("Description") },
+            label = { Text("Step Description") },
             modifier = Modifier.fillMaxWidth(),
             minLines = 2
         )

@@ -19,6 +19,7 @@ interface RecipeDao {
     @Query("SELECT * FROM recipe WHERE isFavorite = 1")
     fun getFavoriteRecipes(): Flow<List<Recipe>>
 
+    // Retrieves a recipe along with its associated ingredients and steps as a single object
     @Transaction
     @Query("SELECT * FROM recipe WHERE recipeId = :recipeId")
     fun getRecipeWithDetails(recipeId: Int): Flow<RecipeWithDetails>

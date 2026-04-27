@@ -15,9 +15,9 @@ interface StepDao {
     @Query("SELECT * FROM Step WHERE recipeId = :recipeId ORDER BY sequenceNum ASC")
     fun getStepsForRecipe(recipeId: Int): Flow<List<Step>>
 
-    // returns a single step by its ID
+    // returns the stepId after inserting
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertStep(step: Step)
+    suspend fun insertStep(step: Step): Long
 
     // deletes a single step
     @Delete

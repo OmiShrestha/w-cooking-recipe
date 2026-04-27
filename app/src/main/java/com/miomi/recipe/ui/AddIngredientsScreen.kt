@@ -9,12 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.miomi.recipe.viewmodel.AddRecipeViewModel
@@ -42,27 +41,19 @@ fun AddIngredientsScreen(navController: NavController, viewModel: AddRecipeViewM
     val focusManager = LocalFocusManager.current
     var errorMessage by rememberSaveable { mutableStateOf("") }
 
-
     Scaffold { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState())
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = { focusManager.clearFocus() })
                 },
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Add recipe", style = MaterialTheme.typography.headlineLarge)
+            Text("Step 2 of 3 - Ingredients", style = MaterialTheme.typography.headlineLarge)
             HorizontalDivider(thickness = 2.dp)
-
-            Text(
-                "Step 2 of 3 - Ingredients",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.secondary
-            )
 
             LazyColumn(
                 modifier = Modifier.weight(1f),
@@ -99,27 +90,17 @@ fun AddIngredientsScreen(navController: NavController, viewModel: AddRecipeViewM
                 )
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.weight(1f)
-                ) { Text("Back") }
-                Button(
-                    onClick = {
-                        if (viewModel.isIngredientsValid()) {
-                            navController.navigate("add_steps")
-                        } else {
-                            errorMessage = "Please fill in all ingredient fields"
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Next")
-                }
-            }
+            FormButtons(
+                onCancel = { navController.popBackStack("recipe_list", inclusive = false) },
+                onSave = {
+                    if (viewModel.isIngredientsValid()) {
+                        navController.navigate("add_steps")
+                    } else {
+                        errorMessage = "Please fill in all ingredient fields"
+                    }
+                },
+                saveLabel = "Next"
+            )
         }
     }
 }
@@ -151,7 +132,7 @@ private fun IngredientRow(
         OutlinedTextField(
             value = ingredient.name,
             onValueChange = { onUpdate(ingredient.copy(name = it)) },
-            label = {Text("Name")},
+            label = {Text("Ingredient Name")},
             modifier = Modifier.fillMaxWidth()
         )
         Row(
@@ -159,15 +140,21 @@ private fun IngredientRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ){
             OutlinedTextField(
+                value = ingredient.quantity,
+                onValueChange = {
+                    if (it.isEmpty() || it.matches(Regex("^\\d*\\.?\\d*$"))) {
+                        onUpdate(ingredient.copy(quantity = it))
+                    }
+                },
+                label = { Text("Quantity") },
+                modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+            )
+
+            OutlinedTextField(
                 value = ingredient.unit,
                 onValueChange = { onUpdate(ingredient.copy(unit = it)) },
-                label = {Text("unit")},
-                modifier = Modifier.weight(1f)
-            )
-            OutlinedTextField(
-                value = ingredient.quantity,
-                onValueChange = { onUpdate(ingredient.copy(quantity = it)) },
-                label = {Text("quantity")},
+                label = {Text("Unit")},
                 modifier = Modifier.weight(1f)
             )
         }

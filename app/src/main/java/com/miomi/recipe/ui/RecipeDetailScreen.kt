@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -15,10 +16,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.miomi.recipe.model.Ingredient
@@ -32,30 +32,41 @@ fun RecipeDetailScreen(
     viewModel: RecipeViewModel,
     recipeId: Int?
 ) {
-    val id = recipeId ?: -1
-    val recipe by viewModel.getRecipeStream(id).collectAsStateWithLifecycle(null)
-    val ingredients by viewModel.getIngredientsStream(id).collectAsStateWithLifecycle(emptyList())
-    val steps by viewModel.getStepsStream(id).collectAsStateWithLifecycle(emptyList())
-
-    if (recipe == null) {
+    if (recipeId == null) {
         Box(modifier = Modifier.fillMaxSize()) {
             Text("Recipe not found")
         }
         return
     }
 
-    Scaffold { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            ScreenTitle()
-            RecipeInfo(recipe!!, ingredients, steps)
-            BackButton(navController)
+    val recipeWithDetails by viewModel.getRecipeWithDetails(recipeId).collectAsStateWithLifecycle(null)
+
+    when {
+        recipeWithDetails == null -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        else -> {
+            recipeWithDetails?.let { details ->
+                Scaffold { paddingValues ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        ScreenTitle()
+                        RecipeInfo(details.recipe, details.ingredients, details.steps)
+                        BackButton(navController)
+                    }
+                }
+            }
         }
     }
 }
@@ -77,16 +88,11 @@ private fun RecipeInfo(recipe: Recipe, ingredients: List<Ingredient>, steps: Lis
         Text("No ingredients added", style = MaterialTheme.typography.bodyMedium)
     } else {
         ingredients.forEach { ingredient ->
-            // Split ingredient name by line breaks and display each as a bullet
-            ingredient.name.split("\n").forEach { line ->
-                if (line.isNotBlank()) {
-                    Text(
-                        text = "• ${line.trim()}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 2.dp)
-                    )
-                }
-            }
+            Text(
+                text = "• ${ingredient.quantity} ${ingredient.unit} ${ingredient.name}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 2.dp)
+            )
         }
     }
     HorizontalDivider()
@@ -95,19 +101,12 @@ private fun RecipeInfo(recipe: Recipe, ingredients: List<Ingredient>, steps: Lis
     if (steps.isEmpty()) {
         Text("No instructions added", style = MaterialTheme.typography.bodyMedium)
     } else {
-        var instructionIndex = 1
         steps.forEach { step ->
-            // Split step text by line breaks and display each as a numbered item
-            step.step.split("\n").forEach { line ->
-                if (line.isNotBlank()) {
-                    Text(
-                        text = "${instructionIndex}. ${line.trim()}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                    instructionIndex++
-                }
-            }
+            Text(
+                text = "${step.sequenceNum}. ${step.step}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
         }
     }
     HorizontalDivider()
@@ -118,8 +117,7 @@ private fun RecipeInfo(recipe: Recipe, ingredients: List<Ingredient>, steps: Lis
 private fun SectionHeader(label: String) {
     Text(
         text = label,
-        fontSize = 18.sp,
-        fontWeight = FontWeight.Bold,
+        style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
     )
@@ -130,11 +128,13 @@ fun DetailSection(label: String, value: String) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
             text = label.uppercase(),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary
         )
-        Text(text = value, fontSize = 15.sp)
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium
+        )
         HorizontalDivider()
     }
 }

@@ -10,15 +10,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface IngredientDao {
-    @Query("SELECT * FROM Ingredient WHERE recipeId = :recipeId")           // adding recipeId to the query to filter ingredients by recipe
+    @Query("SELECT * FROM Ingredient WHERE recipeId = :recipeId")
     fun getAllIngredientsForRecipe(recipeId: Int): Flow<List<Ingredient>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertIngredient(ingredient: Ingredient)
+    suspend fun insertIngredient(ingredient: Ingredient): Long
 
     @Delete
     suspend fun deleteIngredient(ingredient: Ingredient)
 
-    @Query("DELETE FROM Ingredient WHERE recipeId = :recipeId")             // adding recipeId to the query to delete ingredients by recipe 
+    @Query("DELETE FROM Ingredient WHERE recipeId = :recipeId")
     suspend fun deleteAllIngredientsForRecipe(recipeId: Int)
 }

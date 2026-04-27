@@ -14,5 +14,5 @@ data class RecipeWithDetails (
         parentColumn = "recipeId",
         entityColumn = "recipeId"
     )
-    val step: List<Step>
+    val steps: List<Step>
 )

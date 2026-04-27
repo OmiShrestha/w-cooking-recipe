@@ -10,16 +10,20 @@ import com.miomi.recipe.data.repository.RecipeRepository
 import com.miomi.recipe.model.Ingredient
 import com.miomi.recipe.model.Recipe
 import com.miomi.recipe.model.Step
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
+/**
+ * Main ViewModel for the app
+ * Provides data streams for the UI and handles all database operations.
+ * Scoped to the main navGraph so that it can be shared across all screens
+ * */
 class RecipeViewModel(private val  recipeRepository: RecipeRepository ) : ViewModel()
 {
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val myRepository = // 4
+                val myRepository =
                     (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
                             as RecipeApplication).recipeRepository
                 RecipeViewModel(
@@ -29,8 +33,8 @@ class RecipeViewModel(private val  recipeRepository: RecipeRepository ) : ViewMo
         }
     }
 
-    val recipesFlow = recipeRepository.getAllRecipesStream()
-    val favoritesFlow = recipeRepository.getAllFavoritesStream()
+    val recipesFlow = recipeRepository.getRecipesStream()
+    val favoritesFlow = recipeRepository.getFavoritesStream()
 
     fun toggleFavorite(recipeId: Int, isFavorite: Boolean) {
         viewModelScope.launch {
@@ -42,12 +46,9 @@ class RecipeViewModel(private val  recipeRepository: RecipeRepository ) : ViewMo
         return RecipeRepository.categories
     }
 
-    //TODO: this is not how recipes should be created. I am only doing this to get the app compiling
-    fun getRecipeStream(id: Int): Flow<Recipe?> = recipeRepository.getRecipeById(id)
-    fun getIngredientsStream(recipeId: Int): Flow<List<Ingredient>> = recipeRepository.getIngredientsStream(recipeId)
-    fun getStepsStream(recipeId: Int): Flow<List<Step>> = recipeRepository.getStepsStream(recipeId)
+    fun getRecipeWithDetails(recipeId: Int) = recipeRepository.getRecipeWithDetails(recipeId)
 
-    fun newAddRecipe(formState: AddRecipeFormState){
+    fun addRecipe(formState: AddRecipeFormState){
         viewModelScope.launch {
             val recipeId = recipeRepository.insertRecipe(
                 Recipe(
@@ -61,7 +62,7 @@ class RecipeViewModel(private val  recipeRepository: RecipeRepository ) : ViewMo
                     Ingredient(
                         recipeId = recipeId.toInt(),
                         name = entry.name,
-                        quantity = entry.quantity.toIntOrNull() ?: 0,
+                        quantity = entry.quantity.toDoubleOrNull() ?: 0.0,
                         unit = entry.unit
                     )
                 )
@@ -76,15 +77,6 @@ class RecipeViewModel(private val  recipeRepository: RecipeRepository ) : ViewMo
                     )
                 )
             }
-        }
-    }
-
-    fun addRecipe(name: String, category: String, ingredients: String, instructions: String) {
-        viewModelScope.launch {
-            val newId = (System.currentTimeMillis() % Int.MAX_VALUE).toInt()
-            recipeRepository.insertRecipe(Recipe(newId, name, category, false))
-            recipeRepository.insertIngredient(Ingredient(recipeId = newId, name = ingredients, quantity = 1, unit = ""))
-            recipeRepository.insertStep(Step(recipeId = newId, sequenceNum = 1, step = instructions))
         }
     }
 

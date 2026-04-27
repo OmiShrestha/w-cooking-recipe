@@ -3,16 +3,12 @@ package com.miomi.recipe.ui
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,26 +40,16 @@ fun AddRecipeDetailsScreen(navController: NavController, viewModel: AddRecipeVie
                 },
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Add Recipe", style = MaterialTheme.typography.headlineLarge)
+            Text("Step 1 of 3 — Details", style = MaterialTheme.typography.headlineLarge)
             HorizontalDivider(thickness = 2.dp)
 
-            Text(
-                "Step 1 of 3 — Recipe Details",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.secondary
-            )
-
             RecipeDetailsSection(
-                state = RecipeFormState(
-                    name = viewModel.formState.recipeName,
-                    category = viewModel.formState.category
-                ),
+                name = viewModel.formState.recipeName,
+                category = viewModel.formState.category,
                 focusManager = focusManager,
-                categories = listOf("Breakfast", "Lunch", "Dinner", "Dessert"),
-                onStateChange = {
-                    viewModel.updateRecipeName(it.name)
-                    viewModel.updateCategory(it.category)
-                }
+                categories = viewModel.getCategories(),
+                onNameChange = { viewModel.updateRecipeName(it) },
+                onCategoryChange = { viewModel.updateCategory(it) }
             )
 
             if (errorMessage.isNotEmpty()) {
@@ -74,29 +60,17 @@ fun AddRecipeDetailsScreen(navController: NavController, viewModel: AddRecipeVie
                 )
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Cancel", color = MaterialTheme.colorScheme.secondary)
-                }
-                Button(
-                    onClick = {
-                        if (viewModel.isDetailsValid()) {
-                            navController.navigate("add_ingredients")
-                        } else {
-                            errorMessage = "Please fill in all fields"
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Next")
-                }
-            }
+            FormButtons(
+                onCancel = { navController.popBackStack() },
+                onSave = {
+                    if (viewModel.isDetailsValid()) {
+                        navController.navigate("add_ingredients")
+                    } else {
+                        errorMessage = "Please fill in all fields"
+                    }
+                },
+                saveLabel = "Next"
+            )
         }
     }
 }

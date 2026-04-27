@@ -4,11 +4,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.miomi.recipe.data.repository.RecipeRepository
 
+/**
+ * This ViewModel is scoped only to the create_recipe nested navGraph
+ * It manages the AddRecipeFormState across the three separate recipe creation screens
+ */
+
+//This data class is distinct from the recipe room entity and represents the UI state for the recipe creation flow.
 data class AddRecipeFormState(
     val recipeName: String = "",
     val category: String = "",
-    val ingredients: List<IngredientEntry> = listOf((IngredientEntry())),
+    val ingredients: List<IngredientEntry> = listOf(IngredientEntry()),
     val steps: List<StepEntry> = listOf(StepEntry())
 )
 
@@ -26,6 +33,8 @@ data class StepEntry(
 class AddRecipeViewModel : ViewModel() {
     var formState by mutableStateOf(AddRecipeFormState())
         private set
+
+    fun getCategories() = RecipeRepository.categories
 
     fun updateRecipeName(recipeName: String){
         formState = formState.copy(recipeName = recipeName)
@@ -78,6 +87,5 @@ class AddRecipeViewModel : ViewModel() {
     }
 
     fun isStepsValid() = formState.steps.all { it.description.isNotBlank() }
-
 
 }

@@ -80,7 +80,6 @@ fun RecipeListScreen(navController: NavController, viewModel: RecipeViewModel) {
     }
 }
 
-// Placeholder screen for favorites (later will be replaced with actual implementation)
 @Composable
 private fun ScreenTitle(onFavoritesClick: () -> Unit) {
     Row(

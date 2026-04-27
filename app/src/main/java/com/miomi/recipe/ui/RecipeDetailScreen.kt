@@ -88,8 +88,9 @@ private fun RecipeInfo(recipe: Recipe, ingredients: List<Ingredient>, steps: Lis
         Text("No ingredients added", style = MaterialTheme.typography.bodyMedium)
     } else {
         ingredients.forEach { ingredient ->
+            val qty = if (ingredient.quantity % 1.0 == 0.0) ingredient.quantity.toInt().toString() else ingredient.quantity.toString()
             Text(
-                text = "• ${ingredient.quantity} ${ingredient.unit} ${ingredient.name}",
+                text = "• $qty ${ingredient.unit} ${ingredient.name}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 2.dp)
             )

@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -19,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -125,6 +127,22 @@ fun CategoryDropdownMenu(
             )
         }
     }
+}
+
+// reusable dialog for confirming if user wants to discard changes when navigating back from an edit screen with unsaved changes
+@Composable
+fun DiscardChangesDialog(onDiscard: () -> Unit, onKeepEditing: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onKeepEditing,
+        title = { Text("Discard changes?") },
+        text = { Text("Your changes will be lost if you go back.") },
+        confirmButton = {
+            TextButton(onClick = onDiscard) { Text("Discard") }
+        },
+        dismissButton = {
+            TextButton(onClick = onKeepEditing) { Text("Keep editing") }
+        }
+    )
 }
 
 @Composable

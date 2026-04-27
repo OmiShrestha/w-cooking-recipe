@@ -1,5 +1,6 @@
 package com.miomi.recipe.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,16 @@ import com.miomi.recipe.viewmodel.AddRecipeViewModel
 fun AddRecipeDetailsScreen(navController: NavController, viewModel: AddRecipeViewModel) {
     val focusManager = LocalFocusManager.current
     var errorMessage by rememberSaveable { mutableStateOf("") }
+    var showDiscardDialog by rememberSaveable { mutableStateOf(false) }
+
+    BackHandler(enabled = viewModel.isEditing) { showDiscardDialog = true }
+
+    if (showDiscardDialog) {
+        DiscardChangesDialog(
+            onDiscard = { navController.popBackStack() },
+            onKeepEditing = { showDiscardDialog = false }
+        )
+    }
 
     Scaffold { paddingValues ->
         Column(
@@ -64,7 +75,10 @@ fun AddRecipeDetailsScreen(navController: NavController, viewModel: AddRecipeVie
             }
 
             FormButtons(
-                onCancel = { navController.popBackStack() },
+                onCancel = {
+                    if (viewModel.isEditing) showDiscardDialog = true
+                    else navController.popBackStack()
+                },
                 onSave = {
                     if (viewModel.isDetailsValid()) {
                         navController.navigate(if (viewModel.isEditing) "edit_add_ingredients" else "add_ingredients")

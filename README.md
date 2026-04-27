@@ -23,3 +23,6 @@ add_steps --> recipe_list : save
 favorites --> recipe_list : back
 recipe_detail --> recipe_list : back
 @enduml
+
+## Database Schema
+![Entity Relationship Diagram](docs/erd.png)

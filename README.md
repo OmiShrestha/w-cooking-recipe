@@ -48,9 +48,28 @@ recipe_list --> recipe_detail : tap recipe card
 
 state "create_recipe_flow" as CreateFlow {
     [*] --> add_recipe_details
-    add_recipe_details --> add_ingredients : next
     add_ingredients --> add_steps : next
+
+    add_ingredients --> add_recipe_details : back
+    add_recipe_details --> add_ingredients : next
+
+    add_steps --> add_ingredients : back
+
 }
+state "edit_recipe_flow" as EditFLow {
+    [*] --> edit_recipe_details
+    edit_add_ingredients --> edit_add_steps : next
+    edit_recipe_details --> edit_add_ingredients : next
+
+    edit_add_ingredients -->edit_recipe_details : back
+
+    edit_add_steps --> edit_add_ingredients : back
+    edit_add_steps --> recipe_detail : update recipe
+    edit_recipe_details --> recipe_detail : cancel
+
+}
+
+recipe_detail --> EditFLow : edit button
 
 recipe_list --> CreateFlow : FAB
 add_recipe_details --> recipe_list : cancel

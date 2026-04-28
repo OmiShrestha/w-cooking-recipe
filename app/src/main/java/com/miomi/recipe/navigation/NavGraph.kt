@@ -129,7 +129,6 @@ fun NavGraph(navController: NavHostController) {
             }
         }
 
-        // placeholder for favorites screen
         composable("favorites") {
             FavoritesScreen(navController, recipeViewModel)
         }

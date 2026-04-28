@@ -92,6 +92,8 @@ recipe_detail --> recipe_list : back
 | `add_ingredients` | Step 2 of the create recipe flow. Collects the ingredients with name, quantity, and unit. |
 | `add_steps` | Step 3 of the create recipe flow. Collects the preparation steps in order. This is where the user saves their new recipe. |
 
+# Note: All screens used to edit a saved recipe are reused screens from the add-recipe flow
+
 ---
 
 ## App Architecture

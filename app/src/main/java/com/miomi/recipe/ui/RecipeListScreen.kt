@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -59,10 +60,14 @@ fun RecipeListScreen(navController: NavController, viewModel: RecipeViewModel) {
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            ScreenTitle(onFavoritesClick = { navController.navigate("favorites") })
+            ScreenTitle(
+                onFavoritesClick = { navController.navigate("favorites") },
+                onSearchClick = { navController.navigate("api_search") }
+            )
 
+            val allCategories = (viewModel.getCategories() + recipes.map { it.category }).distinct()
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                viewModel.getCategories().forEach { category ->
+                allCategories.forEach { category ->
                     val categoryRecipes = recipes.filter {
                         it.category.equals(category, ignoreCase = true)
                     }
@@ -81,7 +86,7 @@ fun RecipeListScreen(navController: NavController, viewModel: RecipeViewModel) {
 }
 
 @Composable
-private fun ScreenTitle(onFavoritesClick: () -> Unit) {
+private fun ScreenTitle(onFavoritesClick: () -> Unit, onSearchClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -91,12 +96,21 @@ private fun ScreenTitle(onFavoritesClick: () -> Unit) {
             text = "Recipe List",
             style = MaterialTheme.typography.headlineLarge
         )
-        IconButton(onClick = onFavoritesClick) {
-            Icon(
-                imageVector = Icons.Default.Favorite,
-                contentDescription = "View Favorites",
-                tint = MaterialTheme.colorScheme.primary
-            )
+        Row {
+            IconButton(onClick = onSearchClick) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search Online",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+            IconButton(onClick = onFavoritesClick) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "View Favorites",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
     HorizontalDivider(

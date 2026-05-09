@@ -13,10 +13,14 @@ import androidx.navigation.compose.navigation
 import com.miomi.recipe.ui.AddIngredientsScreen
 import com.miomi.recipe.ui.AddRecipeDetailsScreen
 import com.miomi.recipe.ui.AddStepsScreen
+import com.miomi.recipe.ui.ApiMealDetailScreen
+import com.miomi.recipe.ui.ApiSearchScreen
 import com.miomi.recipe.ui.FavoritesScreen
 import com.miomi.recipe.ui.RecipeDetailScreen
 import com.miomi.recipe.ui.RecipeListScreen
 import com.miomi.recipe.viewmodel.AddRecipeViewModel
+import com.miomi.recipe.viewmodel.ApiMealDetailViewModel
+import com.miomi.recipe.viewmodel.ApiSearchViewModel
 import com.miomi.recipe.viewmodel.IngredientEntry
 import com.miomi.recipe.viewmodel.RecipeViewModel
 import com.miomi.recipe.viewmodel.StepEntry
@@ -131,6 +135,21 @@ fun NavGraph(navController: NavHostController) {
 
         composable("favorites") {
             FavoritesScreen(navController, recipeViewModel)
+        }
+
+        composable("api_search") {
+            val apiSearchViewModel: ApiSearchViewModel = viewModel(
+                factory = ApiSearchViewModel.Factory
+            )
+            ApiSearchScreen(navController, apiSearchViewModel)
+        }
+
+        composable("api_meal_detail/{mealId}") { backStackEntry ->
+            val mealId = backStackEntry.arguments?.getString("mealId") ?: ""
+            val apiMealDetailViewModel: ApiMealDetailViewModel = viewModel(
+                factory = ApiMealDetailViewModel.Factory
+            )
+            ApiMealDetailScreen(navController, mealId, apiMealDetailViewModel)
         }
     }
 }

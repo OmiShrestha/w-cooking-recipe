@@ -165,3 +165,42 @@ StepDao --> RecipeDatabase
 | `IngredientDao` | Data | Room DAO for CRUD operations on the `Ingredient` table |
 | `StepDao` | Data | Room DAO for CRUD operations on the `Step` table |
 | `RecipeDatabase` | Data | Room database; hosts all three tables and provides DAO instances |
+
+---
+
+## API Integration
+
+The app integrates with [TheMealDB](https://www.themealdb.com/api.php) (free tier) to let users search for meals online and save them as local recipes.
+
+### API Screens
+
+| Screen | Function |
+|---|---|
+| `api_search` | Search by meal name, category, or ingredient. Displays results as a scrollable list of cards. |
+| `api_meal_detail/{mealId}` | Shows full meal details fetched from the API: category, area, ingredients with measures, and numbered cooking steps. A FAB lets the user save the meal to the local database. |
+
+### Network Layer
+
+| Component | Purpose |
+|---|---|
+| `RetrofitClient` | Singleton Retrofit instance configured with base URL `https://www.themealdb.com/api/json/v1/1/` and a Gson converter. Includes an OkHttp logging interceptor for debug builds. |
+| `MealApiService` | Retrofit service interface with suspend functions for `search.php` (by name), `filter.php` (by category/ingredient), and `lookup.php` (by ID). |
+| `MealListResponse` | Wraps the `meals: List<MealDto>?` envelope returned by all API endpoints. |
+| `MealDto` | Maps a full meal object from the API, including 20 ingredient/measure field pairs. Exposes a `getIngredients()` helper that zips non-empty ingredient names with their measures. |
+| `MealRepository` | Interface that abstracts all API calls behind `Result`-returning suspend functions. |
+| `MealRepositoryImpl` | Implements `MealRepository` using `runCatching` for uniform error handling. |
+
+### API ViewModels
+
+| ViewModel | Scope | Purpose |
+|---|---|---|
+| `ApiSearchViewModel` | `api_search` screen | Manages search query, `SearchType` (Name / Category / Ingredient), result list, loading, and error state. |
+| `ApiMealDetailViewModel` | `api_meal_detail` screen | Fetches meal details by ID; handles converting and saving the API meal into local `Recipe`, `Ingredient`, and `Step` entities. |
+
+### Saving an API Meal Locally
+
+When the user taps **"Save Recipe"** on the the screen, `ApiMealDetailViewModel` converts the `MealDto` into local Room entities:
+
+- A `Recipe` row is created from the meal name and category.
+- Each non-empty ingredient/measure pair from `getIngredients()` becomes an `Ingredient` row.
+- The raw instructions string is split on line breaks, blank lines and "Step N:" labels are stripped, and each remaining line becomes an ordered `Step` row.

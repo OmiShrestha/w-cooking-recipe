@@ -44,7 +44,8 @@ import com.miomi.recipe.viewmodel.ApiMealDetailViewModel
 fun ApiMealDetailScreen(
     navController: NavController,
     mealId: String,
-    viewModel: ApiMealDetailViewModel
+    viewModel: ApiMealDetailViewModel,
+    isAdmin: Boolean = false
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -62,7 +63,7 @@ fun ApiMealDetailScreen(
             )
         },
         floatingActionButton = {
-            if (uiState.meal != null) {
+            if (uiState.meal != null && isAdmin) {
                 SaveFab(isSaved = uiState.isSaved, onSave = viewModel::saveMeal)
             }
         }

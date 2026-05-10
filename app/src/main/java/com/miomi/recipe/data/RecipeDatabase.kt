@@ -10,13 +10,17 @@ import com.miomi.recipe.data.dao.StepDao
 import com.miomi.recipe.model.Ingredient
 import com.miomi.recipe.model.Recipe
 import com.miomi.recipe.model.Step
+import com.miomi.recipe.data.dao.UserDao
+import com.miomi.recipe.model.User
 
-@Database(entities = [Recipe::class, Ingredient::class, Step::class], version = 1,
+// Room database class for the recipe app
+@Database(entities = [Recipe::class, Ingredient::class, Step::class, User::class], version = 2,
     exportSchema = false)
 abstract class RecipeDatabase : RoomDatabase() {
     abstract fun recipeDao(): RecipeDao
     abstract fun ingredientDao(): IngredientDao
     abstract fun stepDao(): StepDao
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile

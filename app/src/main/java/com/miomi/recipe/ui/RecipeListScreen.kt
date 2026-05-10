@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,17 +41,20 @@ import com.miomi.recipe.model.Recipe
 import com.miomi.recipe.viewmodel.RecipeViewModel
 
 @Composable
-fun RecipeListScreen(navController: NavController, viewModel: RecipeViewModel) {
+fun RecipeListScreen(navController: NavController, viewModel: RecipeViewModel, isAdmin: Boolean, onSignOut: () -> Unit = {}) {
     val recipes by viewModel.recipesFlow.collectAsStateWithLifecycle(emptyList())
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate("create_recipe_flow") },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "add_recipe")
+            // Only show the add button for admins
+            if (isAdmin) {
+                FloatingActionButton(
+                    onClick = { navController.navigate("create_recipe_flow") },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "add_recipe")
+                }
             }
         }
     ) { paddingValues ->
@@ -62,7 +66,8 @@ fun RecipeListScreen(navController: NavController, viewModel: RecipeViewModel) {
         ) {
             ScreenTitle(
                 onFavoritesClick = { navController.navigate("favorites") },
-                onSearchClick = { navController.navigate("api_search") }
+                onSearchClick = { navController.navigate("api_search") },
+                onSignOut = onSignOut
             )
 
             val allCategories = (viewModel.getCategories() + recipes.map { it.category }).distinct()
@@ -77,7 +82,8 @@ fun RecipeListScreen(navController: NavController, viewModel: RecipeViewModel) {
                         navController = navController,
                         onToggleFavorite = { recipe ->
                             viewModel.toggleFavorite(recipe.recipeId, recipe.isFavorite)
-                        }
+                        },
+                        isAdmin = isAdmin
                     )
                 }
             }
@@ -86,7 +92,7 @@ fun RecipeListScreen(navController: NavController, viewModel: RecipeViewModel) {
 }
 
 @Composable
-private fun ScreenTitle(onFavoritesClick: () -> Unit, onSearchClick: () -> Unit) {
+private fun ScreenTitle(onFavoritesClick: () -> Unit, onSearchClick: () -> Unit, onSignOut: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -111,6 +117,14 @@ private fun ScreenTitle(onFavoritesClick: () -> Unit, onSearchClick: () -> Unit)
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
+
+            IconButton(onClick = onSignOut) {
+                Icon(
+                    imageVector = Icons.Default.Logout,
+                    contentDescription = "Sign Out",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
     HorizontalDivider(
@@ -123,7 +137,8 @@ private fun LazyListScope.recipeCategorySection(
     category: String,
     recipes: List<Recipe>,
     navController: NavController,
-    onToggleFavorite: (Recipe) -> Unit
+    onToggleFavorite: (Recipe) -> Unit,
+    isAdmin: Boolean = false
 ) {
     item {
         Text(

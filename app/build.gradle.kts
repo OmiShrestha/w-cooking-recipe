@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -20,6 +22,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Load sensitive data from local.properties and add them to this BuildConfig
+        val localProps = Properties()
+        localProps.load(rootProject.file("local.properties").inputStream())
+        buildConfigField("String", "WEB_CLIENT_ID", "\"${localProps["WEB_CLIENT_ID"]}\"")
+        buildConfigField("String", "ADMIN_EMAIL_1", "\"${localProps["ADMIN_EMAIL_1"]}\"")
+        buildConfigField("String", "ADMIN_EMAIL_2", "\"${localProps["ADMIN_EMAIL_2"]}\"")
     }
 
     buildTypes {
@@ -37,6 +46,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -57,6 +67,11 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
+
+    //Added for Google Sign-In support
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services)
+    implementation(libs.googleid)
 
     //Added for font support
     implementation(libs.androidx.compose.ui.text.google.fonts)

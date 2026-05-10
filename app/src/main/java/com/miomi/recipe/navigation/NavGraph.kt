@@ -16,28 +16,56 @@ import com.miomi.recipe.ui.AddStepsScreen
 import com.miomi.recipe.ui.ApiMealDetailScreen
 import com.miomi.recipe.ui.ApiSearchScreen
 import com.miomi.recipe.ui.FavoritesScreen
+import com.miomi.recipe.ui.LoginScreen
 import com.miomi.recipe.ui.RecipeDetailScreen
 import com.miomi.recipe.ui.RecipeListScreen
 import com.miomi.recipe.viewmodel.AddRecipeViewModel
 import com.miomi.recipe.viewmodel.ApiMealDetailViewModel
 import com.miomi.recipe.viewmodel.ApiSearchViewModel
+import com.miomi.recipe.viewmodel.AuthViewModel
+import com.miomi.recipe.model.UserRole
 import com.miomi.recipe.viewmodel.IngredientEntry
 import com.miomi.recipe.viewmodel.RecipeViewModel
 import com.miomi.recipe.viewmodel.StepEntry
 import kotlin.text.toInt
 
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph(navController: NavHostController, authViewModel: AuthViewModel) {
     val recipeViewModel: RecipeViewModel = viewModel(
         factory = RecipeViewModel.Factory
     )
 
+    // Observe the current user from the AuthViewModel
+    val currentUser by authViewModel.currentUser.collectAsStateWithLifecycle()
+
+    LaunchedEffect(currentUser) {
+        if (currentUser != null) {
+            navController.navigate("recipe_list") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
+    }
+
     NavHost(
         navController = navController,
-        startDestination = "recipe_list"
+        startDestination = "login"
     ) {
+        composable("login") {
+            LoginScreen(authViewModel)
+        }
+
         composable("recipe_list") {
-            RecipeListScreen(navController, recipeViewModel)
+            RecipeListScreen(
+                navController = navController,
+                viewModel = recipeViewModel,
+                isAdmin = currentUser?.role == UserRole.ADMIN,
+                onSignOut = {
+                    authViewModel.signOut()
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
 
         navigation(startDestination = "add_recipe_details", route = "create_recipe_flow"){
@@ -68,7 +96,7 @@ fun NavGraph(navController: NavHostController) {
 
         composable("recipe_detail/{recipeId}") { backStackEntry ->
             val recipeId = backStackEntry.arguments?.getString("recipeId")?.toInt()
-            RecipeDetailScreen(navController, recipeViewModel, recipeId)
+            RecipeDetailScreen(navController, recipeViewModel, recipeId, isAdmin = currentUser?.role == UserRole.ADMIN)
         }
 
         // nested navigation graph for editing a recipe, reusing the same screens as the create flow but with pre-populated data
@@ -134,7 +162,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable("favorites") {
-            FavoritesScreen(navController, recipeViewModel)
+            FavoritesScreen(navController, recipeViewModel, isAdmin = currentUser?.role == UserRole.ADMIN)
         }
 
         composable("api_search") {
@@ -149,7 +177,7 @@ fun NavGraph(navController: NavHostController) {
             val apiMealDetailViewModel: ApiMealDetailViewModel = viewModel(
                 factory = ApiMealDetailViewModel.Factory
             )
-            ApiMealDetailScreen(navController, mealId, apiMealDetailViewModel)
+            ApiMealDetailScreen(navController, mealId, apiMealDetailViewModel, isAdmin = currentUser?.role == UserRole.ADMIN)
         }
     }
 }

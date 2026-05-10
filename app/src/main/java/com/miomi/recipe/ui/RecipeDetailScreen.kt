@@ -8,13 +8,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -27,11 +33,13 @@ import com.miomi.recipe.model.Recipe
 import com.miomi.recipe.model.Step
 import com.miomi.recipe.viewmodel.RecipeViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailScreen(
     navController: NavController,
     viewModel: RecipeViewModel,
-    recipeId: Int?
+    recipeId: Int?,
+    isAdmin: Boolean = false
 ) {
     if (recipeId == null) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -53,7 +61,18 @@ fun RecipeDetailScreen(
         }
         else -> {
             recipeWithDetails?.let { details ->
-                Scaffold { paddingValues ->
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = { Text(details.recipe.name) },
+                            navigationIcon = {
+                                IconButton(onClick = { navController.popBackStack() }) {
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                }
+                            }
+                        )
+                    }
+                ) { paddingValues ->
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -62,15 +81,15 @@ fun RecipeDetailScreen(
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        ScreenTitle()
                         RecipeInfo(details.recipe, details.ingredients, details.steps)
-                        Button(
-                            onClick = { navController.navigate("edit_recipe_flow/${details.recipe.recipeId}") },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Edit Recipe")
+                        if (isAdmin) {
+                            Button(
+                                onClick = { navController.navigate("edit_recipe_flow/${details.recipe.recipeId}") },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Edit Recipe")
+                            }
                         }
-                        BackButton(navController)
                     }
                 }
             }

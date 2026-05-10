@@ -26,7 +26,7 @@ import androidx.navigation.NavController
 import com.miomi.recipe.viewmodel.RecipeViewModel
 
 @Composable
-fun FavoritesScreen(navController: NavController, viewModel: RecipeViewModel) {
+fun FavoritesScreen(navController: NavController, viewModel: RecipeViewModel, isAdmin: Boolean = false) {
     val favorites by viewModel.favoritesFlow.collectAsStateWithLifecycle(emptyList())
 
     Scaffold { paddingValues ->

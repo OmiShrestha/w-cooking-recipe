@@ -3,6 +3,7 @@ package com.miomi.recipe.network.repository
 import com.miomi.recipe.network.MealApiService
 import com.miomi.recipe.network.model.MealDto
 
+// Implementation of the MealRepository interface that uses the MealApiService to fetch data
 class MealRepositoryImpl(private val apiService: MealApiService) : MealRepository {
 
     override suspend fun searchByName(name: String): Result<List<MealDto>> = runCatching {

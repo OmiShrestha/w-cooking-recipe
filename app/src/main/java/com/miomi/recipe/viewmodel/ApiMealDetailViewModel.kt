@@ -45,6 +45,7 @@ class ApiMealDetailViewModel(
         }
     }
 
+    // Load meal details by ID and update UI state accordingly
     fun loadMeal(id: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
@@ -61,6 +62,7 @@ class ApiMealDetailViewModel(
         }
     }
 
+    // Save the current meal to the local database as a recipe with ingredients and steps
     fun saveMeal() {
         val meal = _uiState.value.meal ?: return
         viewModelScope.launch {
@@ -87,6 +89,7 @@ class ApiMealDetailViewModel(
         }
     }
 
+    // Helper function to parse the measure string into quantity and unit
     private fun parseMeasure(measure: String): Pair<Double, String> {
         val parts = measure.trim().split(Regex("\\s+"), limit = 2)
         val qty = parts.getOrElse(0) { "" }.toDoubleOrNull()

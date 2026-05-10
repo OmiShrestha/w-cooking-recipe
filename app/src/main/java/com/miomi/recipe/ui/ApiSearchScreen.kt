@@ -39,6 +39,7 @@ import com.miomi.recipe.network.model.MealDto
 import com.miomi.recipe.viewmodel.ApiSearchViewModel
 import com.miomi.recipe.viewmodel.SearchType
 
+// Composable screen for searching recipes from TheMealDB API
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ApiSearchScreen(navController: NavController, viewModel: ApiSearchViewModel) {
@@ -89,6 +90,7 @@ fun ApiSearchScreen(navController: NavController, viewModel: ApiSearchViewModel)
     }
 }
 
+// Composable screen for typing search queries and selecting search type (name, category, ingredient)
 @Composable
 private fun SearchTypeSelector(selectedType: SearchType, onTypeSelected: (SearchType) -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -102,6 +104,7 @@ private fun SearchTypeSelector(selectedType: SearchType, onTypeSelected: (Search
     }
 }
 
+// Composable screen for searching recipes to input search queries
 @Composable
 private fun SearchInputRow(
     query: String,
@@ -126,6 +129,7 @@ private fun SearchInputRow(
     }
 }
 
+// Composable screen to display meal results
 @Composable
 private fun MealResultsList(meals: List<MealDto>, onMealClick: (MealDto) -> Unit) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -135,6 +139,7 @@ private fun MealResultsList(meals: List<MealDto>, onMealClick: (MealDto) -> Unit
     }
 }
 
+// Composable screen to display meal details fetched
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MealResultCard(meal: MealDto, onClick: () -> Unit) {
@@ -167,6 +172,7 @@ private fun MealResultCard(meal: MealDto, onClick: () -> Unit) {
     }
 }
 
+// Loading state
 @Composable
 private fun LoadingIndicator() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -174,6 +180,7 @@ private fun LoadingIndicator() {
     }
 }
 
+// Error state
 @Composable
 private fun ErrorMessage(message: String) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -181,6 +188,7 @@ private fun ErrorMessage(message: String) {
     }
 }
 
+// Empty results state
 @Composable
 private fun EmptyResults() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

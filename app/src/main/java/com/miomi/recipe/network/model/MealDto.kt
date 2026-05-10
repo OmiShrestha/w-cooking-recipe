@@ -33,7 +33,7 @@ data class MealDto(
     @SerializedName("strIngredient19") val strIngredient19: String?,
     @SerializedName("strIngredient20") val strIngredient20: String?,
 
-    // Corresponding measures for each ingredient
+    // Corresponding measures for each ingredient in the same order
     @SerializedName("strMeasure1") val strMeasure1: String?,
     @SerializedName("strMeasure2") val strMeasure2: String?,
     @SerializedName("strMeasure3") val strMeasure3: String?,

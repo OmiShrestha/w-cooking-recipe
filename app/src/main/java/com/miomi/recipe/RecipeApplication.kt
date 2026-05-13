@@ -20,6 +20,6 @@ class RecipeApplication : Application() {
         val database = RecipeDatabase.getDatabase(this)
         recipeRepository = RecipeRepositoryImpl(database)
         mealRepository = MealRepositoryImpl(RetrofitClient.mealApiService)
-        authRepository = AuthRepositoryImpl(this, database.userDao())
+        authRepository = AuthRepositoryImpl( database.userDao())
     }
 }

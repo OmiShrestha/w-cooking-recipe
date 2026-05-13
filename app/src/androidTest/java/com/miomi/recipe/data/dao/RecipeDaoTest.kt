@@ -82,7 +82,7 @@ class RecipeDaoTest {
             Recipe(name = "Cake", category = "Dessert", isFavorite = false)
         ).toInt()
 
-            //TODO: Im not sure if its good practice to use other DAOs in another DAOs test class
+
         db.ingredientDao().insertIngredient(
             Ingredient(recipeId = recipeId, name = "Flour", quantity = 2.0, unit = "cups")
         )
@@ -98,6 +98,116 @@ class RecipeDaoTest {
         assertEquals(1, result.steps.size)
         assertEquals("Add", result.steps[0].step)
     }
+
+
+    @Test
+    @Throws(Exception::class)
+    fun deleteRecipeTest() = runBlocking {
+        val recipeId = recipeDao.insertRecipe(
+            Recipe(name = "Cake", category = "Dessert", isFavorite = false)
+        ).toInt()
+        val recipe = Recipe(recipeId = recipeId, name = "Cake", category = "Dessert", isFavorite = false)
+
+        recipeDao.deleteRecipe(recipe)
+
+        val result = recipeDao.getRecipeById(recipeId).first()
+        assertEquals(null, result)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun deleteRecipeCascadeIngredientTest() = runBlocking {
+
+        //test whether deleting a recipe also deletes its ingredients
+        val recipeId = recipeDao.insertRecipe(
+            Recipe(name = "Cake", category = "Dessert", isFavorite = false)
+        ).toInt()
+        val recipe = Recipe(recipeId = recipeId, name = "Cake", category = "Dessert", isFavorite = false)
+
+
+        db.ingredientDao().insertIngredient(Ingredient(recipeId = recipeId, name = "cheese", quantity = 1.0, unit = "block"))
+
+        recipeDao.deleteRecipe(recipe)
+
+        val ingredients = db.ingredientDao().getAllIngredientsForRecipe(recipeId).first()
+        assertEquals(0, ingredients.size)
+
+        val result = recipeDao.getRecipeById(recipeId).first()
+        assertEquals(null, result)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun deleteRecipeCascadeStepsTest() = runBlocking {
+
+        //test whether deleting a recipe also deletes its steps
+        val recipeId = recipeDao.insertRecipe(
+            Recipe(name = "Cake", category = "Dessert", isFavorite = false)
+        ).toInt()
+        val recipe = Recipe(recipeId = recipeId, name = "Cake", category = "Dessert", isFavorite = false)
+
+
+        db.stepDao().insertStep(Step(recipeId = recipeId, sequenceNum = 1, step = "chop celery"))
+
+        recipeDao.deleteRecipe(recipe)
+
+        val steps = db.stepDao().getStepsForRecipe(recipeId).first()
+        assertEquals(0, steps.size)
+
+        val result = recipeDao.getRecipeById(recipeId).first()
+        assertEquals(null, result)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun getRecipeWithDetailsEmptyTest() = runBlocking {
+        val recipeId = recipeDao.insertRecipe(
+            Recipe(name = "soda", category = "Dessert", isFavorite = false)
+        ).toInt()
+
+        val result = recipeDao.getRecipeWithDetails(recipeId).first()
+
+        assertEquals("soda", result.recipe.name)
+        assertEquals(0, result.ingredients.size)
+        assertEquals(0, result.steps.size)
+    }
+
+
+    @Test
+    @Throws(Exception::class)
+    fun updateRecipeTest() = runBlocking {
+        val recipeId = recipeDao.insertRecipe(
+            Recipe(name = "pork", category = "dinner", isFavorite = false)
+        ).toInt()
+
+        val updatedRecipe = Recipe(recipeId = recipeId, name = "chicken", category = "lunch", isFavorite = false)
+        db.recipeDao().updateRecipe(updatedRecipe)
+
+        val newRecipe = db.recipeDao().getRecipeById(recipeId).first()
+
+        assertEquals("chicken", newRecipe?.name)
+        assertEquals("lunch", newRecipe?.category)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun getRecipeByIdTest() = runBlocking {
+
+        //Add three total recipes to make sure that the id filtering is working
+        recipeDao.insertRecipe(Recipe(name = "chicken", category = "dinner", isFavorite = false))
+        val recipeId = recipeDao.insertRecipe(
+            Recipe(name = "pork", category = "dinner", isFavorite = false)
+        ).toInt()
+        recipeDao.insertRecipe(Recipe(name = "fish", category = "dessert", isFavorite = false))
+
+
+        val result = db.recipeDao().getRecipeById(recipeId).first()
+
+        assertEquals("pork", result?.name)
+        assertEquals("dinner", result?.category)
+
+    }
+
 
     @After
     fun teardown() {

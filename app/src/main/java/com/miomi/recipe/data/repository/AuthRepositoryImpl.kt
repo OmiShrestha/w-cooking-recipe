@@ -15,10 +15,14 @@ import com.miomi.recipe.model.UserRole
 class AuthRepositoryImpl(
     private val userDao: UserDao
 ) : AuthRepository {
+
+    //WEB_CLIENT_ID is the Oauth client id from google cloud that identifies app to google's sign in service
+
     private val webClientId = BuildConfig.WEB_CLIENT_ID
     private val adminEmails = setOf(BuildConfig.ADMIN_EMAIL_1, BuildConfig.ADMIN_EMAIL_2)
 
     override suspend fun signIn(activityContext: Context): Result<User> {
+        //TODO: move this logic to VM instead of repo
         val credentialManager = CredentialManager.create(activityContext)
 
         val googleIdOption = GetGoogleIdOption.Builder()

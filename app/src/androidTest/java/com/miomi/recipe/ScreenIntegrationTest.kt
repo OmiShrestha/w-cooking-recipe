@@ -13,7 +13,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.miomi.recipe.model.Recipe
 import com.miomi.recipe.ui.AddRecipeDetailsScreen
 import com.miomi.recipe.ui.RecipeCard
+import com.miomi.recipe.ui.RecipeListScreen
 import com.miomi.recipe.viewmodel.AddRecipeViewModel
+import com.miomi.recipe.viewmodel.RecipeViewModel
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,6 +26,15 @@ class ScreenIntegrationTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    private lateinit var fakeRepository: FakeRecipeRepository
+    private lateinit var recipeViewModel: RecipeViewModel
+
+    @Before
+    fun setup() {
+        fakeRepository = FakeRecipeRepository()
+        recipeViewModel = RecipeViewModel(fakeRepository)
+    }
 
     // Verifies that RecipeCard renders the recipe's name and category, and that
     // the card and favorite button are clickable with the correct favorite state
@@ -66,5 +78,33 @@ class ScreenIntegrationTest {
         composeTestRule.onNodeWithText("Next").performClick()
 
         composeTestRule.onNodeWithText("Please fill in all fields").assertIsDisplayed()
+    }
+
+    //verifies that the admin sees the add recipe button
+    @Test
+    fun adminSeesAddRecipeButton() {
+        composeTestRule.setContent {
+            RecipeListScreen(
+                navController = rememberNavController(),
+                viewModel = recipeViewModel,
+                isAdmin = true,
+                onSignOut = {}
+            )
+        }
+        composeTestRule.onNodeWithContentDescription("add_recipe").assertIsDisplayed()
+    }
+
+    //verifies that non-admins do not see the recipe button
+    @Test
+    fun nonAdminDoesNotSeeAddRecipeButton() {
+        composeTestRule.setContent {
+            RecipeListScreen(
+                navController = rememberNavController(),
+                viewModel = recipeViewModel,
+                isAdmin = false,
+                onSignOut = {}
+            )
+        }
+        composeTestRule.onNodeWithContentDescription("add_recipe").assertDoesNotExist()
     }
 }

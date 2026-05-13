@@ -39,7 +39,6 @@ class IngredientDaoTest {
     @Test
     @Throws(Exception::class)
     fun insertIngredientTest() = runBlocking {
-        //Just checking whether
         //insertRecipe() has already been unit tested
         val recipe = Recipe(name = "Pasta", category = "Dinner", isFavorite = false)
         val recipeId = recipeDao.insertRecipe(recipe).toInt()

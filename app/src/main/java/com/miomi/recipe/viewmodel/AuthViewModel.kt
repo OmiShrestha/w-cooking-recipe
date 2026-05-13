@@ -3,7 +3,7 @@ package com.miomi.recipe.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.miomi.recipe.data.AuthRepository
+import com.miomi.recipe.data.repository.AuthRepository
 import com.miomi.recipe.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

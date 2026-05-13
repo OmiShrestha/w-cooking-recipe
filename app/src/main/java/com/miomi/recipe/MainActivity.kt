@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 val app = application as RecipeApplication
                 @Suppress("UNCHECKED_CAST")
-                return AuthViewModel(app.authRepository) as T
+                return AuthViewModel(app.authRepositoryImpl) as T
             }
         }
     }

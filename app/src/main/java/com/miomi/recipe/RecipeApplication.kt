@@ -1,8 +1,9 @@
 package com.miomi.recipe
 
 import android.app.Application
-import com.miomi.recipe.data.AuthRepository
+import com.miomi.recipe.data.repository.AuthRepository
 import com.miomi.recipe.data.RecipeDatabase
+import com.miomi.recipe.data.repository.AuthRepositoryImpl
 import com.miomi.recipe.data.repository.RecipeRepository
 import com.miomi.recipe.data.repository.RecipeRepositoryImpl
 import com.miomi.recipe.network.RetrofitClient
@@ -19,6 +20,6 @@ class RecipeApplication : Application() {
         val database = RecipeDatabase.getDatabase(this)
         recipeRepository = RecipeRepositoryImpl(database)
         mealRepository = MealRepositoryImpl(RetrofitClient.mealApiService)
-        authRepository = AuthRepository(this, database.userDao())
+        authRepository = AuthRepositoryImpl(this, database.userDao())
     }
 }

@@ -1,4 +1,4 @@
-package com.miomi.recipe.data
+package com.miomi.recipe.data.repository
 
 import android.content.Context
 import androidx.credentials.CredentialManager
@@ -6,19 +6,19 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.miomi.recipe.BuildConfig
 import com.miomi.recipe.data.dao.UserDao
 import com.miomi.recipe.model.User
 import com.miomi.recipe.model.UserRole
 
 // Repository class for handling user authentication and data storage
-class AuthRepository(
-    private val context: Context,
+class AuthRepositoryImpl(
     private val userDao: UserDao
-) {
-    private val webClientId = com.miomi.recipe.BuildConfig.WEB_CLIENT_ID
-    private val adminEmails = setOf(com.miomi.recipe.BuildConfig.ADMIN_EMAIL_1, com.miomi.recipe.BuildConfig.ADMIN_EMAIL_2)
+) : AuthRepository {
+    private val webClientId = BuildConfig.WEB_CLIENT_ID
+    private val adminEmails = setOf(BuildConfig.ADMIN_EMAIL_1, BuildConfig.ADMIN_EMAIL_2)
 
-    suspend fun signIn(activityContext: Context): Result<User> {
+    override suspend fun signIn(activityContext: Context): Result<User> {
         val credentialManager = CredentialManager.create(activityContext)
 
         val googleIdOption = GetGoogleIdOption.Builder()
@@ -37,7 +37,8 @@ class AuthRepository(
             val name = credential.displayName ?: email
             val profilePictureUrl = credential.profilePictureUri?.toString()
             val role = if (email in adminEmails) UserRole.ADMIN else UserRole.USER
-            val user = User(email = email, name = name, profilePictureUrl = profilePictureUrl, role = role)
+            val user =
+                User(email = email, name = name, profilePictureUrl = profilePictureUrl, role = role)
             userDao.insertUser(user)
             Result.success(user)
         } catch (e: GetCredentialException) {
@@ -45,7 +46,7 @@ class AuthRepository(
         }
     }
 
-    suspend fun getLoggedInUser(): User? = userDao.getLoggedInUser()
+    override suspend fun getLoggedInUser(): User? = userDao.getLoggedInUser()
 
-    suspend fun signOut() = userDao.clearUser()
+    override suspend fun signOut() = userDao.clearUser()
 }

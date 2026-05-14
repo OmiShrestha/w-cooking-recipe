@@ -1,4 +1,4 @@
-// Author: Omi Shrestha
+// Author: Omi Shrestha + mike romano
 
 package com.miomi.recipe
 
@@ -11,8 +11,11 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.miomi.recipe.model.Recipe
+import com.miomi.recipe.ui.AddIngredientsScreen
 import com.miomi.recipe.ui.AddRecipeDetailsScreen
+import com.miomi.recipe.ui.AddStepsScreen
 import com.miomi.recipe.ui.RecipeCard
+import com.miomi.recipe.ui.RecipeDetailScreen
 import com.miomi.recipe.ui.RecipeListScreen
 import com.miomi.recipe.viewmodel.AddRecipeViewModel
 import com.miomi.recipe.viewmodel.RecipeViewModel
@@ -107,4 +110,106 @@ class ScreenIntegrationTest {
         }
         composeTestRule.onNodeWithContentDescription("add_recipe").assertDoesNotExist()
     }
+
+    @Test
+    fun addIngredientsScreenShowsErrorWhenFieldsBlank() {
+        composeTestRule.setContent {
+            AddIngredientsScreen(
+                navController = rememberNavController(),
+                viewModel = AddRecipeViewModel()
+            )
+        }
+
+        composeTestRule.onNodeWithText("Next").performClick()
+
+        composeTestRule.onNodeWithText("Please fill in all ingredient fields").assertIsDisplayed()
+    }
+
+    //verifies that clicking add ingredient button adds a new row to the list
+    @Test
+    fun addIngredientsScreenAddsIngredientRow() {
+        composeTestRule.setContent {
+            AddIngredientsScreen(
+                navController = rememberNavController(),
+                viewModel = AddRecipeViewModel()
+            )
+        }
+
+        composeTestRule.onNodeWithText("Ingredient 1").assertIsDisplayed()
+        composeTestRule.onNodeWithText(" Add Ingredient").performClick()
+        composeTestRule.onNodeWithText("Ingredient 2").assertIsDisplayed()
+    }
+
+    @Test
+    fun addStepsScreenShowsErrorWhenFieldsBlank() {
+        composeTestRule.setContent {
+            AddStepsScreen(
+                navController = rememberNavController(),
+                addRecipeViewModel = AddRecipeViewModel(),
+                recipeViewModel = recipeViewModel
+            )
+        }
+
+        composeTestRule.onNodeWithText("Save Recipe").performClick()
+
+        composeTestRule.onNodeWithText("Please fill in all step fields").assertIsDisplayed()
+    }
+
+    @Test
+    fun addStepsScreenAddsStepRow() {
+        composeTestRule.setContent {
+            AddStepsScreen(
+                navController = rememberNavController(),
+                addRecipeViewModel = AddRecipeViewModel(),
+                recipeViewModel = recipeViewModel
+            )
+        }
+
+        composeTestRule.onNodeWithText("Step 1").assertIsDisplayed()
+        composeTestRule.onNodeWithText(" Add Step").performClick()
+        composeTestRule.onNodeWithText("Step 2").assertIsDisplayed()
+    }
+
+
+
+
+    // only admin should see the edit recipe button
+    @Test
+    fun adminSeesEditRecipeButton() {
+        val recipe = Recipe(recipeId = 1, name = "Dr. Bi's famous meatloaf", category = "Dinner", isFavorite = false)
+        fakeRepository.seedRecipes(recipe)
+
+        composeTestRule.setContent {
+            RecipeDetailScreen(
+                navController = rememberNavController(),
+                viewModel = recipeViewModel,
+                recipeId = 1,
+                isAdmin = true
+            )
+        }
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Edit Recipe").assertIsDisplayed()
+    }
+
+    // non admins should not see the edit recipe button
+    @Test
+    fun nonAdminDoesNotSeeEditRecipeButton() {
+        val recipe = Recipe(recipeId = 1, name = "Dr. Bi's favorite sandwich", category = "Dinner", isFavorite = false)
+        fakeRepository.seedRecipes(recipe)
+
+        composeTestRule.setContent {
+            RecipeDetailScreen(
+                navController = rememberNavController(),
+                viewModel = recipeViewModel,
+                recipeId = 1,
+                isAdmin = false
+            )
+        }
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Edit Recipe").assertDoesNotExist()
+    }
+
+
 }

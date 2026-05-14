@@ -35,47 +35,52 @@
 | `sequenceNum` | INTEGER | Not Null |
 | `step` | TEXT | Not Null |
 
+**User**
+
+| Column | Type | Constraints |
+|---|---|---|
+| `email` | TEXT | Primary Key |
+| `name` | TEXT | Defaults to email if null|
+| `profilePictureUrl` | TEXT, Nullable|
+| `role` | TEXT | ADMIN/USER, Not Null |
+
 ---
 
 ## Navigation Graph
 
 ```plantuml
 @startuml
-[*] --> recipe_list
+state login
+[*] --> login
+
+login --> recipe_list : sign in success
 
 recipe_list --> favorites : heart button
 recipe_list --> recipe_detail : tap recipe card
+recipe_list --> CreateFlow : FAB (admin only)
 
 state "create_recipe_flow" as CreateFlow {
     [*] --> add_recipe_details
-    add_ingredients --> add_steps : next
-
-    add_ingredients --> add_recipe_details : back
     add_recipe_details --> add_ingredients : next
-
+    add_ingredients --> add_recipe_details : back
+    add_ingredients --> add_steps : next
     add_steps --> add_ingredients : back
-
 }
-state "edit_recipe_flow" as EditFLow {
+
+state "edit_recipe_flow" as EditFlow {
     [*] --> edit_recipe_details
-    edit_add_ingredients --> edit_add_steps : next
     edit_recipe_details --> edit_add_ingredients : next
-
-    edit_add_ingredients -->edit_recipe_details : back
-
+    edit_add_ingredients --> edit_recipe_details : back
+    edit_add_ingredients --> edit_add_steps : next
     edit_add_steps --> edit_add_ingredients : back
     edit_add_steps --> recipe_detail : update recipe
     edit_recipe_details --> recipe_detail : cancel
-
 }
 
-recipe_detail --> EditFLow : edit button
-
-recipe_list --> CreateFlow : FAB
-add_recipe_details --> recipe_list : cancel
-CreateFlow --> recipe_list : cancel
-add_steps --> recipe_list : save
-
+recipe_detail --> EditFlow : edit button (admin only)
+recipe_list --> api_search : search button
+api_search --> api_meal_detail : tap result
+recipe_list --> login : sign out
 favorites --> recipe_list : back
 recipe_detail --> recipe_list : back
 @enduml
@@ -85,12 +90,14 @@ recipe_detail --> recipe_list : back
 
 | Screen | Function |
 |---|---|
+| `login` | Entry point of application for new users. Can be navigated to only on first time launch or after logging out. Succesful login navigates to recipe_list |
 | `recipe_list` | Displays all recipes organized by category. Entry point for navigating to recipe detail, favorites, and the create recipe flow. |
 | `favorites` | Displays all recipes marked as favorites. Navigated to by selecting the heart icon. |
 | `recipe_detail` | Displays the full details of a selected recipe including ingredients and steps. |
 | `add_recipe_details` | Step 1 of the create recipe flow. Collects the recipe name and category. |
 | `add_ingredients` | Step 2 of the create recipe flow. Collects the ingredients with name, quantity, and unit. |
-| `add_steps` | Step 3 of the create recipe flow. Collects the preparation steps in order. This is where the user saves their new recipe. |
+| `api_search_screen` | Key word search for recipes bases on name, category, or ingredient. Searching returns a list of recipes. |
+| `api_meal_detail_screen` | Navigated to by selecting a meal in the api_search_screen. Presents meal recipe details with option to save recipe. |
 
 # Note: All screens used to edit a saved recipe are reused screens from the add-recipe flow
 
@@ -103,9 +110,15 @@ recipe_detail --> recipe_list : back
 skinparam componentStyle rectangle
 
 package "UI Layer" {
+    package "api_search_flow" {
+        [ApiSearchScreen]
+        [ApiMealDetailScreen]
+    }
+
     [RecipeListScreen]
     [FavoritesScreen]
     [RecipeDetailScreen]
+    [LoginScreen]
     package "create_recipe_flow (nested nav graph)" {
         [AddRecipeDetailsScreen]
         [AddIngredientsScreen]
@@ -116,31 +129,63 @@ package "UI Layer" {
 package "ViewModel Layer" {
     [RecipeViewModel] <<scoped to NavGraph>>
     [AddRecipeViewModel] <<scoped to create_recipe_flow>>
+    [ApiSearchViewModel] <<scoped to ApiSearchScreen>>
+    [ApiMealDetailViewModel] <<scoped to ApiMealDetailScreen>>
+    [AuthViewModel] <<scoped to MainActivity>>
 }
 
 package "Data Layer" {
     [RecipeRepository]
+    [RecipeRepositoryImpl]
+    [AuthRepository]
+    [AuthRepositoryImpl]
     [RecipeDao]
     [IngredientDao]
     [StepDao]
+    [UserDao]
     database "RecipeDatabase" {
     }
 }
 
+package "Network Layer" {
+    [MealRepository]
+    [MealRepositoryImpl]
+    [MealApiService]
+    [RetrofitClient]
+}
+
+ApiSearchViewModel --> MealRepository
+ApiMealDetailViewModel --> MealRepository
+ApiMealDetailViewModel --> RecipeRepository
+MealRepositoryImpl ..|> MealRepository
+MealRepositoryImpl --> MealApiService
+MealApiService --> RetrofitClient
+
+
+
+AuthRepositoryImpl ..|> AuthRepository
+AuthRepositoryImpl --> UserDao
+
 RecipeListScreen --> RecipeViewModel
 FavoritesScreen --> RecipeViewModel
 RecipeDetailScreen --> RecipeViewModel
+ApiSearchScreen --> ApiSearchViewModel
+ApiMealDetailScreen --> ApiMealDetailViewModel
 AddStepsScreen --> RecipeViewModel
-AddStepsScreen --> AddRecipeViewModel
 AddRecipeDetailsScreen --> AddRecipeViewModel
 AddIngredientsScreen --> AddRecipeViewModel
+LoginScreen --> AuthViewModel
+AddStepsScreen --> AddRecipeViewModel
 
 RecipeViewModel --> RecipeRepository
 AddRecipeViewModel ..> RecipeRepository : categories (static)
 
-RecipeRepository --> RecipeDao
-RecipeRepository --> IngredientDao
-RecipeRepository --> StepDao
+RecipeRepositoryImpl ..|> RecipeRepository
+RecipeRepositoryImpl --> RecipeDao
+RecipeRepositoryImpl --> IngredientDao
+RecipeRepositoryImpl --> StepDao
+AuthViewModel --> AuthRepository
+UserDao --> RecipeDatabase
 
 RecipeDao --> RecipeDatabase
 IngredientDao --> RecipeDatabase
@@ -204,3 +249,26 @@ When the user taps **"Save Recipe"** on the the screen, `ApiMealDetailViewModel`
 - A `Recipe` row is created from the meal name and category.
 - Each non-empty ingredient/measure pair from `getIngredients()` becomes an `Ingredient` row.
 - The raw instructions string is split on line breaks, blank lines and "Step N:" labels are stripped, and each remaining line becomes an ordered `Step` row.
+
+## Testing
+
+### Unit Tests
+| Test Class | What it Tests |
+|---|---|
+| `RecipeViewModelTest` | Recipe stream, favorite toggling, and recipe insertion via fake repository |
+| `AddRecipeViewModelTest` | Form state management, validation, and ingredient and step operations |
+| `ApiSearchViewModelTest` | Search query handling, search type dispatch, successand failure states |
+
+### Instrumented Tests (`src/androidTest/`)
+
+#### DAO Tests
+| Test Class | What it Tests |
+|---|---|
+| `RecipeDaoTest` | CRUD operations on the `recipe` table, favorite filtering, cascade delete |
+| `IngredientDaoTest` | CRUD operations on the `Ingredient` table, per-recipe deletion |
+| `StepDaoTest` | CRUD operations on the `Step` table, per ecipe deletion, step ordering |
+
+#### UI Integration Tests
+| Test Class | What it Tests |
+|---|---|
+| `ScreenIntegrationTest` | RecipeCard rendering, admin vs non admin visibility, form validation errors, ingredient and step row addition |

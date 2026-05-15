@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -111,6 +113,16 @@ private fun MealDetailContent(meal: MealDto, paddingValues: PaddingValues) {
         modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
+        if (!meal.strMealThumb.isNullOrBlank()) {
+            item {
+                AsyncImage(
+                    model = meal.strMealThumb,
+                    contentDescription = meal.strMeal,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxWidth().height(220.dp)
+                )
+            }
+        }
         item { CategoryChips(meal.strCategory, meal.strArea) }
         if (meal.getIngredients().isNotEmpty()) {
             item { SectionHeader("Ingredients") }

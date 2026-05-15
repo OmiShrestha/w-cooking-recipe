@@ -67,6 +67,9 @@ dependencies {
     //Added for navigation support
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
+    //Added for image loading support
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
     //Added for network/API support
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)

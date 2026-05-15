@@ -28,4 +28,6 @@ class RecipeRepositoryImpl (private val recipeDb: RecipeDatabase) : RecipeReposi
 
     override suspend fun deleteAllStepsForRecipe(recipeId: Int) = recipeDb.stepDao().deleteAllStepsForRecipe(recipeId)
 
+    override suspend fun deleteRecipe(recipe: Recipe) = recipeDb.recipeDao().deleteRecipe(recipe)
+
 }

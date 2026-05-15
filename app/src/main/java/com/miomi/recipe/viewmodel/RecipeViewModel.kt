@@ -80,6 +80,13 @@ class RecipeViewModel(private val  recipeRepository: RecipeRepository ) : ViewMo
         }
     }
 
+    fun deleteRecipe(recipe: Recipe, onDeleted: () -> Unit) {
+        viewModelScope.launch {
+            recipeRepository.deleteRecipe(recipe)
+            onDeleted()
+        }
+    }
+
     // updates an existing recipe by first updating the recipe table, then deleting/reinserting all associated ingredients and steps
     fun updateRecipe(formState: AddRecipeFormState) {
         val recipeId = formState.recipeId ?: return

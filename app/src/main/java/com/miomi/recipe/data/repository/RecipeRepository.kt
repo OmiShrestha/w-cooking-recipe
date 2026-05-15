@@ -37,4 +37,6 @@ interface RecipeRepository {
     suspend fun deleteAllIngredientsForRecipe(recipeId: Int)
 
     suspend fun deleteAllStepsForRecipe(recipeId: Int)
+
+    suspend fun deleteRecipe(recipe: Recipe)
 }

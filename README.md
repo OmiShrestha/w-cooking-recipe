@@ -3,7 +3,43 @@
 ## Data Model
 
 ### Entity Relationship Diagram
-![Entity Relationship Diagram](docs/erd.png)
+@startuml
+entity "recipe" {
+    * recipeId : INTEGER <<PK, Auto-generated>>
+    --
+    * name : TEXT
+    * category : TEXT
+    * isFavorite : INTEGER (Boolean)
+}
+
+entity "Ingredient" {
+    * ingredientId : INTEGER <<PK, Auto-generated>>
+    --
+    * recipeId : INTEGER <<FK>>
+    * name : TEXT
+    * quantity : REAL
+    * unit : TEXT
+}
+
+entity "Step" {
+    * stepId : INTEGER <<PK, Auto-generated>>
+    --
+    * recipeId : INTEGER <<FK>>
+    * sequenceNum : INTEGER
+    * step : TEXT
+}
+
+entity "User" {
+    * email : TEXT <<PK>>
+    --
+    * name : TEXT
+    profilePictureUrl : TEXT
+    * role : TEXT
+}
+
+recipe ||--o{ Ingredient : "recipeId"
+recipe ||--o{ Step : "recipeId"
+@enduml
 
 ### Database Schema
 

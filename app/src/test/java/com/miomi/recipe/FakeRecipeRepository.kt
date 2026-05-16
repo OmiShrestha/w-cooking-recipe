@@ -85,4 +85,12 @@ class FakeRecipeRepository : RecipeRepository {
         steps.removeAll { it.recipeId == recipeId }
     }
 
+    override suspend fun deleteRecipe(recipe: Recipe) {
+        recipes.removeAll { it.recipeId == recipe.recipeId }
+        ingredients.removeAll { it.recipeId == recipe.recipeId }
+        steps.removeAll { it.recipeId == recipe.recipeId }
+        recipesFlow.value = recipes.toList()
+        favoritesFlow.value = recipes.filter { it.isFavorite }
+    }
+
 }

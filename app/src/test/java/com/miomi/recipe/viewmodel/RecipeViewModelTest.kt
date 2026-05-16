@@ -54,7 +54,6 @@ class RecipeViewModelTest {
 
         viewModel.addRecipe(formState)
 
-        //TODO: should all of these be individual test cases?
         assertEquals(1, fakeRecipeRepository.recipes.size)
         assertEquals("Pasta", fakeRecipeRepository.recipes[0].name)
 
@@ -70,7 +69,7 @@ class RecipeViewModelTest {
 
 
     @Test
-    fun updateRecipe(){
+    fun updateRecipeTest(){
 
         fakeRecipeRepository.seedRecipes(
             Recipe(recipeId = 1, name = "Old spaghetti", "Dinner", isFavorite = false)

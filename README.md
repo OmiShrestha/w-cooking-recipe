@@ -3,6 +3,7 @@
 ## Data Model
 
 ### Entity Relationship Diagram
+```plantuml
 @startuml
 entity "recipe" {
     * recipeId : INTEGER <<PK, Auto-generated>>
@@ -40,6 +41,7 @@ entity "User" {
 recipe ||--o{ Ingredient : "recipeId"
 recipe ||--o{ Step : "recipeId"
 @enduml
+```
 
 ### Database Schema
 

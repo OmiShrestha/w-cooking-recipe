@@ -1,6 +1,7 @@
 package com.miomi.recipe
 
 import android.app.Application
+import com.miomi.recipe.data.OnboardingPreferences
 import com.miomi.recipe.data.repository.AuthRepository
 import com.miomi.recipe.data.RecipeDatabase
 import com.miomi.recipe.data.repository.AuthRepositoryImpl
@@ -14,12 +15,14 @@ class RecipeApplication : Application() {
     lateinit var recipeRepository: RecipeRepository
     lateinit var mealRepository: MealRepository
     lateinit var authRepository: AuthRepository
+    lateinit var onboardingPreferences: OnboardingPreferences
 
     override fun onCreate() {
         super.onCreate()
         val database = RecipeDatabase.getDatabase(this)
         recipeRepository = RecipeRepositoryImpl(database)
         mealRepository = MealRepositoryImpl(RetrofitClient.mealApiService)
-        authRepository = AuthRepositoryImpl( database.userDao())
+        authRepository = AuthRepositoryImpl(database.userDao())
+        onboardingPreferences = OnboardingPreferences(this)
     }
 }

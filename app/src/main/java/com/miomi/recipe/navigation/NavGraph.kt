@@ -17,6 +17,7 @@ import com.miomi.recipe.ui.ApiMealDetailScreen
 import com.miomi.recipe.ui.ApiSearchScreen
 import com.miomi.recipe.ui.FavoritesScreen
 import com.miomi.recipe.ui.LoginScreen
+import com.miomi.recipe.ui.OnboardingScreen
 import com.miomi.recipe.ui.RecipeDetailScreen
 import com.miomi.recipe.ui.RecipeListScreen
 import com.miomi.recipe.viewmodel.AddRecipeViewModel
@@ -40,7 +41,8 @@ fun NavGraph(navController: NavHostController, authViewModel: AuthViewModel) {
 
     LaunchedEffect(currentUser) {
         if (currentUser != null) {
-            navController.navigate("recipe_list") {
+            val destination = if (!authViewModel.hasSeenOnboarding()) "onboarding" else "recipe_list"
+            navController.navigate(destination) {
                 popUpTo("login") { inclusive = true }
             }
         }
@@ -52,6 +54,17 @@ fun NavGraph(navController: NavHostController, authViewModel: AuthViewModel) {
     ) {
         composable("login") {
             LoginScreen(authViewModel)
+        }
+
+        composable("onboarding") {
+            OnboardingScreen(
+                onComplete = {
+                    authViewModel.markOnboardingComplete()
+                    navController.navigate("recipe_list") {
+                        popUpTo("onboarding") { inclusive = true }
+                    }
+                }
+            )
         }
 
         composable("recipe_list") {

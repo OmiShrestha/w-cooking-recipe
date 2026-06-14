@@ -3,6 +3,7 @@ package com.miomi.recipe.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.miomi.recipe.data.OnboardingPreferences
 import com.miomi.recipe.data.repository.AuthRepository
 import com.miomi.recipe.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +12,8 @@ import kotlinx.coroutines.launch
 
 // ViewModel to manage authentication state and actions
 class AuthViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val onboardingPreferences: OnboardingPreferences
 ) : ViewModel() {
 
     private val _currentUser = MutableStateFlow<User?>(null)
@@ -42,4 +44,8 @@ class AuthViewModel(
             _currentUser.value = null
         }
     }
+
+    fun hasSeenOnboarding(): Boolean = onboardingPreferences.hasSeenOnboarding()
+
+    fun markOnboardingComplete() = onboardingPreferences.markOnboardingComplete()
 }

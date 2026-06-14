@@ -62,6 +62,7 @@ fun NavGraph(navController: NavHostController, authViewModel: AuthViewModel) {
                 onSignOut = {
                     authViewModel.signOut()
                     navController.navigate("login") {
+                        // Clear the back stack to prevent navigating back to the recipe list after signing out
                         popUpTo(0) { inclusive = true }
                     }
                 }
